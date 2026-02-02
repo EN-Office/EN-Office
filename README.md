@@ -1,7 +1,5 @@
 # 榎本 裕也 (Yuya Enomoto) | Portfolio
 
-Facebook: <a href="https://www.facebook.com/variety.yeno">Yuya Enomoto Timeline</a><br>
-
 XR・AI・3DCGの領域を横断し、企画から開発・運用までを統括するプロデューサー/ディレクター。
 技術的知見と体験デザインの両側面から、次世代コンテンツの戦略立案と実装を推進します 。
 
