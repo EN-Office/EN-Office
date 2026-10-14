@@ -2,7 +2,7 @@
 
 | ファイル | 内容 |
 | --- | --- |
-| `local_llm_proposal_v3.html` / `.pptx` | **最新版**。「完全オフラインAIによるシステム保守・エラー解析の効率化」。セキュリティルームの条件を外した汎用版 |
+| `local_llm_proposal_v3.html` / `.pptx` | **最新版**。「完全オフラインAIによるシステム保守・エラー解析の効率化」。外部ネットワークと遮断された閉域ネットワーク内で社内LANから利用する構成 |
 | `local_llm_proposal_v2.html` | セキュリティルーム向け改訂版（HTML）。`section.slide` 1つがスライド1枚。ブラウザで開けばそのまま閲覧・印刷できる |
 | `build_pptx.js` | HTML を読み取り `local_llm_proposal_v2.pptx` を生成する変換スクリプト（pptxgenjs） |
 | `local_llm_proposal_v2.pptx` | 変換済み PowerPoint |

@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>完全オフラインAI 保守支援提案</title>
-<meta name="description" content="完全オフラインAIによるシステム保守・エラー解析の効率化 提案書。各 section.slide が1枚のスライドに対応し、build_pptx.js で PPTX に変換できる。">
+<meta name="description" content="外部ネットワークと遮断された閉域ネットワーク内で、社内LANから利用するローカルLLMの提案書。各 section.slide が1枚のスライドに対応し、build_pptx.js で PPTX に変換できる。">
 <style>
   :root{
     --navy:#14213D; --navy2:#1F2F57; --gold:#C98A2B; --gold-bg:#FBF3E4;
@@ -70,25 +70,25 @@
 <!-- 1 -->
 <section class="slide" data-layout="title">
   <h1>完全オフラインAIによる<br>システム保守・エラー解析の効率化</h1>
-  <p class="sub">インターネット非接続のローカルLLM環境構築 提案書</p>
-  <p class="tagline">欧米オープンモデル選定（商用ライセンス確認済み） | PC購入予算70万円以内の構成 | 保守チャットUI | 導入概算費用</p>
+  <p class="sub">外部ネットワークと遮断された閉域ネットワーク内で、社内LANから利用するローカルLLM環境の構築提案</p>
+  <p class="tagline">欧米オープンモデル選定（商用ライセンス確認済み） | PC購入予算70万円以内の構成 | 社内LANから使える保守チャットUI | 導入概算費用</p>
 </section>
 
 <!-- 2 -->
 <section class="slide" data-layout="content">
   <header>
     <span class="kicker">01. エグゼクティブサマリー</span>
-    <h1>社内で完結する安全かつ高速なAI保守支援基盤</h1>
-    <p class="sub">インターネット非接続の専用PCにローカルLLMを構築し、エラーログ解析の一次対応を支援します</p>
+    <h1>閉域ネットワーク内で完結する安全かつ高速なAI保守支援基盤</h1>
+    <p class="sub">外部ネットワークと遮断された社内LANにAI専用PCを設置し、各担当者のブラウザからエラーログ解析の一次対応を支援します</p>
   </header>
   <div class="cards">
     <div class="card">
-      <h3>完全オフライン運用</h3>
+      <h3>閉域ネットワーク内での運用</h3>
       <p class="tag">セキュリティ</p>
       <ul>
-        <li>インターネットに接続しない専用PCにローカルLLMを構築。スタンドアロン運用、または社内LAN内のみで共有する運用を選択可能</li>
-        <li>機密ログ・ソースコード・障害データの外部ネットワークへの送信リスクを排除</li>
-        <li>OSのファイアウォール設定と無線無効化で外部通信を遮断し、社内セキュリティポリシーに準拠</li>
+        <li>外部ネットワークと遮断された社内LAN内にAI専用PCを設置し、LAN内の端末からのみ利用</li>
+        <li>推論もデータ保存もLAN内で完結し、機密ログ・ソースコード・障害データが外部ネットワークへ出ない</li>
+        <li>固定IP・LAN内アドレスのみ許可するファイアウォール設定と無線無効化で、社内セキュリティポリシーに準拠</li>
         <li>モデル・OS更新は承認済み媒体による持ち込み手順を整備</li>
       </ul>
     </div>
@@ -106,7 +106,7 @@
       <p class="tag">導入</p>
       <ul>
         <li>PC購入予算70万円以内で、用途に応じた2つの構成案を提示</li>
-        <li>ブラウザから使える保守チャットWebUIをキッティングして納品</li>
+        <li>社内LANの各端末からブラウザで使える保守チャットWebUIをキッティングして納品（利用者ごとのアカウント発行）</li>
         <li>導入後すぐに運用を開始可能。年間保守はオプションで提供</li>
       </ul>
     </div>
@@ -138,7 +138,7 @@
 <section class="slide" data-layout="content">
   <header>
     <span class="kicker">03. 推奨PC・ハードウェア構成（デスクトップ）</span>
-    <h1>PC購入予算70万円以内で選べる2つの構成案</h1>
+    <h1>PC購入予算70万円以内で選べるAI専用PCの2つの構成案</h1>
     <p class="sub">価格は2026年10月時点の国内実勢による概算（税抜）。GPU・DDR5メモリは高騰が続いているため、発注時に再見積します</p>
   </header>
   <div class="cards">
@@ -171,7 +171,7 @@
       </ul>
     </div>
   </div>
-  <p class="note">※ オフライン仕様：Wi-Fi / Bluetoothの無効化、OSファイアウォールによる外部通信遮断（社内LAN共有時はLAN内アドレスのみ許可）、自動更新・テレメトリの停止を行って納品します。RTX 4090 / 4070 Ti Super は生産終了のため選定対象外です。</p>
+  <p class="note">※ 閉域ネットワーク仕様：有線LANのみ使用（Wi-Fi / Bluetooth無効化）、固定IP、OSファイアウォールでLAN内アドレスからのWebUIアクセスのみ許可、自動更新・テレメトリの停止を行って納品します。数名規模の同時利用なら1台で対応でき、同時リクエストは順次処理されます。RTX 4090 / 4070 Ti Super は生産終了のため選定対象外です。</p>
 </section>
 
 <!-- 5 -->
@@ -179,7 +179,7 @@
   <header>
     <span class="kicker">04. ノートPC構成（オプション）</span>
     <h1>省スペース・可搬性が必須の場合のノートPC構成案</h1>
-    <p class="sub">ノートPCはGPU 2枚構成が組めないためVRAM上限は24GB。同じ予算ではデスクトップより一段階下の性能になります</p>
+    <p class="sub">ノートPCをLAN内のAIサーバーとして使う構成。GPU 2枚構成が組めないためVRAM上限は24GBで、同じ予算ではデスクトップより一段階下の性能になります</p>
   </header>
   <table>
     <thead>
@@ -206,7 +206,7 @@
       <ul>
         <li>BIOSでWi-Fi / Bluetoothを無効化し、BIOSパスワードを設定（有線LANのみ使用）</li>
         <li>SSD暗号化（BitLocker等）で持ち出し・修理時のデータ保護</li>
-        <li>AC接続時に最大性能・スリープ無効の電源設定</li>
+        <li>AC接続時に最大性能・スリープ無効・蓋を閉じても稼働する電源設定（常時稼働のサーバー用途のため）</li>
       </ul>
     </div>
   </div>
@@ -216,13 +216,13 @@
 <section class="slide" data-layout="content">
   <header>
     <span class="kicker">05. 保守AIチャットUI・システムイメージ</span>
-    <h1>ブラウザで直感的に使える保守チャットインターフェース</h1>
-    <p class="sub">推論エンジン（Ollama）とWebUI（Open WebUI）を納品PCに構築済み。利用者側の追加ソフト導入は不要です</p>
+    <h1>社内LANの各端末からブラウザで使える保守チャットインターフェース</h1>
+    <p class="sub">推論エンジン（Ollama）とWebUI（Open WebUI）をAI専用PCに構築済み。利用者の端末には追加ソフト導入不要で、既存のブラウザからアクセスします</p>
   </header>
   <div class="cols">
     <div class="col">
       <div class="chat">
-        <p class="title">[完全オフライン] 保守AIアシスタント（Gemma 4）</p>
+        <p class="title">[閉域ネットワーク内] 保守AIアシスタント（Gemma 4）</p>
         <div class="msg user"><span class="who">保守担当者</span>下記のエラーログの発生原因と一次対応手順を教えてください。
 --- ERROR 2026-10-07 14:22:01 [DBPool] Connection Timeout ---
 at com.example.service.DatabaseAccess.getConnection(DatabaseAccess.java:42)</div>
@@ -238,9 +238,9 @@ at com.example.service.DatabaseAccess.getConnection(DatabaseAccess.java:42)</div
     </div>
     <div class="col">
       <div class="card"><h3>保守専用プロンプトの組み込み</h3><ul><li>「原因推測」「緊急度」「一次対応手順」を必ず構造化して出力する専用システムプロンプトを事前設定</li></ul></div>
-      <div class="card"><h3>ブラウザ接続（ローカル / 社内LAN）</h3><ul><li>PC起動後、ブラウザを開くだけで利用可能。社内LAN共有時は複数の担当者が同じ環境を利用でき、Open WebUIは社内利用・50ユーザー以下を想定</li></ul></div>
+      <div class="card"><h3>社内LANからのブラウザ接続</h3><ul><li>AI専用PCのLAN内アドレスにブラウザでアクセスするだけで利用可能。利用者ごとのアカウントと会話履歴を管理（Open WebUIは社内利用・50ユーザー以下を想定）</li></ul></div>
       <div class="card"><h3>ワンクリックコピー＆ナレッジ保存</h3><ul><li>回答をコピーして障害報告書に貼り付け可能。過去の障害記録から類似事例を提示する機能（RAG）はオプション</li></ul></div>
-      <div class="card"><h3>インターネット非接続構成</h3><ul><li>推論・データ保存はすべてPC内で完結。外部サーバーへの送信経路を持たないため、インターネット経由の情報漏洩リスクを排除</li></ul></div>
+      <div class="card"><h3>外部ネットワークと遮断された構成</h3><ul><li>通信はLAN内の端末とAI専用PCの間のみ。外部サーバーへの送信経路を持たないため、外部ネットワーク経由の情報漏洩リスクを排除</li></ul></div>
     </div>
   </div>
   <p class="note">※ 画面はイメージです。実際の出力は貴社環境に合わせたプロンプト調整後のものとなります。</p>
@@ -259,9 +259,9 @@ at com.example.service.DatabaseAccess.getConnection(DatabaseAccess.java:42)</div
     </thead>
     <tbody>
       <tr><td><b>1. ハードウェア調達費</b></td><td>GeForce搭載BTO PC、モニター一式<br>（法人保守契約が必要な場合はRTX PRO搭載機で再見積）</td><td>標準 45〜55万円<br>VRAM 32GB 60〜70万円<br>ノートPC 40〜50万円</td></tr>
-      <tr><td><b>2. キッティング＆環境構築</b></td><td>OSセキュリティ設定（外部通信遮断・無線無効化）、推論エンジン（Ollama）とWebUI組み込み、モデルファイルのハッシュ検証、オフライン動作検証</td><td>35〜50万円</td></tr>
+      <tr><td><b>2. キッティング＆環境構築</b></td><td>OSセキュリティ設定（固定IP・LAN内アクセス制限・無線無効化）、推論エンジン（Ollama）とWebUI組み込み、利用者アカウント設定、モデルファイルのハッシュ検証、閉域環境での動作検証</td><td>35〜50万円</td></tr>
       <tr><td><b>3. プロンプト・UI調整</b></td><td>エラーログ解析用テンプレートプロンプト作成、UI画面カスタマイズ、検証用ログテスト</td><td>15〜25万円</td></tr>
-      <tr><td><b>4. 導入支援・設置作業</b></td><td>現地設置・社内LAN接続設定（共有運用時）、取扱説明書・モデル更新手順書作成、運用レクチャー</td><td>10〜15万円</td></tr>
+      <tr><td><b>4. 導入支援・設置作業</b></td><td>現地設置・社内LAN接続設定、各端末からの接続確認、取扱説明書・モデル更新手順書作成、運用レクチャー</td><td>10〜15万円</td></tr>
     </tbody>
   </table>
   <div class="total">
@@ -271,9 +271,9 @@ at com.example.service.DatabaseAccess.getConnection(DatabaseAccess.java:42)</div
   <div class="steps">
     <div class="step"><b>Week 1</b>要件確定・PCハードウェア発注</div>
     <div class="step"><b>Week 2〜3</b>ハード納期待ちの間に検証機でLLM構築・プロンプト調整</div>
-    <div class="step"><b>Week 4</b>納品PCへのキッティング・オフライン設定</div>
+    <div class="step"><b>Week 4</b>納品PCへのキッティング・LAN内アクセス設定</div>
     <div class="step"><b>Week 5</b>ログ解析テスト・受入確認</div>
-    <div class="step"><b>Week 6</b>現地設置・運用レクチャー</div>
+    <div class="step"><b>Week 6</b>現地設置・各端末からの接続確認・運用レクチャー</div>
   </div>
   <p class="note">※ 標準スケジュールは全6週間。GPU搭載PCの納期（2〜4週間）や在庫状況により前後します。</p>
 </section>
@@ -283,20 +283,20 @@ at com.example.service.DatabaseAccess.getConnection(DatabaseAccess.java:42)</div
   <header>
     <span class="kicker">07. 本提案の優位性と期待効果</span>
     <h1>機密保持・費用の見通し・障害対応の平準化を同時に達成</h1>
-    <p class="sub">クラウドAIでは実現しにくい「データを外に出さない」運用を、固定費で実現します</p>
+    <p class="sub">クラウドAIでは実現しにくい「データを社内LANの外に出さない」運用を、固定費で実現します</p>
   </header>
   <div class="effects">
     <div class="effect"><div class="num">1</div><div>
-      <h3>外部送信リスクの排除（セキュリティ強化）</h3>
+      <h3>外部ネットワークへの送信リスクの排除（セキュリティ強化）</h3>
       <ul>
         <li>クラウドAIと異なり、入力データが外部サーバーへ送信されない構成。顧客データ・設定ファイル・スタックトレースを投入可能</li>
-        <li>インターネット非接続のため、クラウドAI利用時に必要なデータ送信先の審査が不要。監査対応の説明が容易</li>
+        <li>外部ネットワークと遮断された閉域構成のため、クラウドAI利用時に必要なデータ送信先の審査が不要。監査対応の説明が容易</li>
       </ul>
     </div></div>
     <div class="effect"><div class="num">2</div><div>
       <h3>API従量課金・月額費用ゼロ（費用固定）</h3>
       <ul>
-        <li>API従量課金や月額サブスクリプション費用が発生せず、初期費用のみで24時間365日利用可能</li>
+        <li>API従量課金や月額サブスクリプション費用が発生せず、初期費用のみで社内LAN内の担当者が24時間365日利用可能</li>
         <li>電気代（高負荷時約300〜600W）と年間保守（オプション）を除き、長期運用のTCOを抑制</li>
       </ul>
     </div></div>
