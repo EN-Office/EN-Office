@@ -254,7 +254,7 @@ function titleSlide(pres, sec) {
   pres.addSection({ title: "表紙" });
   const s = pres.addSlide({ sectionTitle: "表紙" });
   s.background = { color: C.navy };
-  s.addText(text(first(sec, "h1")), { x: MX, y: 1.9, w: SLIDE_W - MX * 2, h: 1.3, align: "center", fontSize: 30, valign: "middle", bold: true, color: C.white, isTextBox: true, fontFace: FONT });
+  s.addText(plain(first(sec, "h1")), { x: MX, y: 1.9, w: SLIDE_W - MX * 2, h: 1.3, align: "center", fontSize: 30, valign: "middle", bold: true, color: C.white, isTextBox: true, fontFace: FONT });
   s.addText(text(first(sec, ".sub")), { x: MX, y: 3.3, w: SLIDE_W - MX * 2, h: 0.5, align: "center", fontSize: 17, color: "E8DCC3", isTextBox: true, fontFace: FONT });
   s.addShape("line", { x: 3.5, y: 4.25, w: SLIDE_W - 7, h: 0, line: { color: "3A4A75", width: 1 } });
   s.addText(text(first(sec, ".tagline")), { x: MX, y: 4.4, w: SLIDE_W - MX * 2, h: 0.5, align: "center", fontSize: 12, color: C.sub, isTextBox: true, fontFace: FONT });

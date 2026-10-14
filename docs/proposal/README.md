@@ -2,7 +2,8 @@
 
 | ファイル | 内容 |
 | --- | --- |
-| `local_llm_proposal_v2.html` | 提案書本体（HTML）。`section.slide` 1つがスライド1枚。ブラウザで開けばそのまま閲覧・印刷できる |
+| `local_llm_proposal_v3.html` / `.pptx` | **最新版**。「完全オフラインAIによるシステム保守・エラー解析の効率化」。セキュリティルームの条件を外した汎用版 |
+| `local_llm_proposal_v2.html` | セキュリティルーム向け改訂版（HTML）。`section.slide` 1つがスライド1枚。ブラウザで開けばそのまま閲覧・印刷できる |
 | `build_pptx.js` | HTML を読み取り `local_llm_proposal_v2.pptx` を生成する変換スクリプト（pptxgenjs） |
 | `local_llm_proposal_v2.pptx` | 変換済み PowerPoint |
 | `../local_llm_proposal_review.md` | 元資料の精査結果と修正提案 |
@@ -12,7 +13,7 @@
 ```bash
 cd docs/proposal
 npm install            # 初回のみ（pptxgenjs, node-html-parser）
-node build_pptx.js     # local_llm_proposal_v2.pptx を上書き生成
+node build_pptx.js local_llm_proposal_v3.html local_llm_proposal_v3.pptx   # 引数省略時は v2 を生成
 ```
 
 ## HTML 編集時の規約
