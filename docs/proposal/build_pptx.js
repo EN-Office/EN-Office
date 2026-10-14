@@ -195,7 +195,7 @@ function addTable(slide, table, x, y, w) {
       maxL = Math.max(maxL, lines(plain(td), colW[ci] - 0.16, pt));
       return { text: runs(td, { fontSize: pt, color: C.ink }), options: { fill: { color: ri % 2 ? C.alt : C.card }, valign: "top" } };
     }));
-    rowH.push((maxL * pt * 1.3) / 72 + 0.16);
+    rowH.push((maxL * pt * 1.45) / 72 + 0.2);
   });
   const h = rowH.reduce((a, b) => a + b, 0);
   slide.addTable(rows, {

@@ -71,7 +71,7 @@
 <section class="slide" data-layout="title">
   <h1>完全オフラインAIによる<br>システム保守・エラー解析の効率化</h1>
   <p class="sub">外部ネットワークと遮断された閉域ネットワーク内で、社内LANから利用するローカルLLM環境の構築提案</p>
-  <p class="tagline">欧米オープンモデル選定（商用ライセンス確認済み） | PC購入予算70万円以内の構成 | 社内LANから使える保守チャットUI | 導入概算費用</p>
+  <p class="tagline">欧米オープンモデル選定（商用ライセンス確認済み） | AI専用PCの構成案 | 社内LANから使える保守チャットUI | 作業内容と導入スケジュール</p>
 </section>
 
 <!-- 2 -->
@@ -105,9 +105,9 @@
       <h3>PC調達からUI構築までワンストップ</h3>
       <p class="tag">導入</p>
       <ul>
-        <li>PC購入予算70万円以内で、用途に応じた2つの構成案を提示</li>
+        <li>用途に応じた2つのAI専用PC構成案を提示</li>
         <li>社内LANの各端末からブラウザで使える保守チャットWebUIをキッティングして納品（利用者ごとのアカウント発行）</li>
-        <li>導入後すぐに運用を開始可能。年間保守はオプションで提供</li>
+        <li>作業はトータル1人月の工数で1名をアサインし、導入後すぐに運用を開始可能</li>
       </ul>
     </div>
   </div>
@@ -138,16 +138,15 @@
 <section class="slide" data-layout="content">
   <header>
     <span class="kicker">03. 推奨PC・ハードウェア構成（デスクトップ）</span>
-    <h1>PC購入予算70万円以内で選べるAI専用PCの2つの構成案</h1>
-    <p class="sub">価格は2026年10月時点の国内実勢による概算（税抜）。GPU・DDR5メモリは高騰が続いているため、発注時に再見積します</p>
+    <h1>用途に応じて選べるAI専用PCの2つの構成案</h1>
+    <p class="sub">いずれも現行世代のGPU搭載BTO PCで構成。GPU・DDR5メモリは在庫変動が大きいため、発注時に調達可能な部品で確定します</p>
   </header>
   <div class="cards">
     <div class="card">
       <h3>案A：標準構成</h3>
       <p class="tag">対象モデル：Gemma 4 12B / 26B MoE、Devstral Small 2 24B、Phi-4 14B</p>
-      <div class="price">約45〜55万円</div>
       <ul>
-        <li><b>GPU：</b>NVIDIA GeForce RTX 5070 Ti 16GB（RTX 5060 Ti 16GBなら約10万円減）</li>
+        <li><b>GPU：</b>NVIDIA GeForce RTX 5070 Ti 16GB（または RTX 5060 Ti 16GB）</li>
         <li><b>CPU：</b>Intel Core Ultra 7 265 または AMD Ryzen 7 9700X</li>
         <li><b>メモリ：</b>DDR5 64GB（32GB×2）</li>
         <li><b>ストレージ：</b>2TB NVMe SSD（Gen4）</li>
@@ -159,7 +158,6 @@
     <div class="card navy">
       <h3>案B：VRAM 32GB構成【推奨】</h3>
       <p class="tag">対象モデル：案Aのすべて ＋ Gemma 4 31B Dense、Devstral Small 2 24B（8bit高精度）</p>
-      <div class="price">約60〜70万円</div>
       <ul>
         <li><b>GPU：</b>NVIDIA GeForce RTX 5060 Ti 16GB ×2枚（合計32GB VRAM）</li>
         <li><b>CPU：</b>AMD Ryzen 7 9700X または Ryzen 9 9900X</li>
@@ -179,17 +177,17 @@
   <header>
     <span class="kicker">04. ノートPC構成（オプション）</span>
     <h1>省スペース・可搬性が必須の場合のノートPC構成案</h1>
-    <p class="sub">ノートPCをLAN内のAIサーバーとして使う構成。GPU 2枚構成が組めないためVRAM上限は24GBで、同じ予算ではデスクトップより一段階下の性能になります</p>
+    <p class="sub">ノートPCをLAN内のAIサーバーとして使う構成。GPU 2枚構成が組めないためVRAM上限は24GBで、デスクトップより一段階下の性能になります</p>
   </header>
   <table>
     <thead>
-      <tr><th style="width:22%">案</th><th style="width:30%">構成</th><th style="width:13%">概算（税抜）</th><th>動作モデル・評価</th></tr>
+      <tr><th style="width:22%">案</th><th style="width:32%">構成</th><th>動作モデル・評価</th></tr>
     </thead>
     <tbody>
-      <tr><td><b>N1：RTX 5090 Laptop 24GB</b></td><td>Core Ultra 9 / Ryzen 9、DDR5 64GB、2TB SSD、18インチ級ゲーミングノート</td><td>60〜80万円</td><td>Gemma 4 31B DenseがVRAM内で動作（約15〜20トークン/秒）。予算内に収まる機種が限られるため要見積</td></tr>
-      <tr><td><b>N2：RTX 5080 Laptop 16GB</b><br><span class="ok">【ノートPC推奨】</span></td><td>同上の16GB版</td><td>40〜50万円</td><td>デスクトップ案Aと同等（Gemma 4 12B / 26B MoE、Devstral 24B）。31B Denseは対象外。価格・性能・調達のバランスが最良</td></tr>
-      <tr><td><b>N3：Ryzen AI Max+ 395<br>128GBユニファイドメモリ</b></td><td>HP ZBook Ultra G1a、ASUS ROG Flow Z13 等。GPUに最大96〜112GB割当可</td><td>55〜70万円</td><td>31B Denseはメモリに収まるが帯域256GB/sのため約5〜8トークン/秒。Gemma 4 26B MoEなら約20〜30トークン/秒で実用的。Ollamaでの事前動作検証が前提</td></tr>
-      <tr><td><b>N4：MacBook Pro M4 Max 128GB</b></td><td>Apple Silicon、ユニファイドメモリ</td><td class="warn">70〜80万円</td><td>31B Denseで約15トークン/秒。予算超過かつWindows前提の運用・BIOS無効化要件と合わないため参考扱い</td></tr>
+      <tr><td><b>N1：RTX 5090 Laptop 24GB</b></td><td>Core Ultra 9 / Ryzen 9、DDR5 64GB、2TB SSD、18インチ級ゲーミングノート</td><td>Gemma 4 31B DenseがVRAM内で動作（約15〜20トークン/秒）。ノートPC構成の中では最上位</td></tr>
+      <tr><td><b>N2：RTX 5080 Laptop 16GB</b><br><span class="ok">【ノートPC推奨】</span></td><td>同上の16GB版</td><td>デスクトップ案Aと同等（Gemma 4 12B / 26B MoE、Devstral 24B）。31B Denseは対象外。性能・調達のバランスが最良</td></tr>
+      <tr><td><b>N3：Ryzen AI Max+ 395<br>128GBユニファイドメモリ</b></td><td>HP ZBook Ultra G1a、ASUS ROG Flow Z13 等。GPUに最大96〜112GB割当可</td><td>31B Denseはメモリに収まるが帯域256GB/sのため約5〜8トークン/秒。Gemma 4 26B MoEなら約20〜30トークン/秒で実用的。Ollamaでの事前動作検証が前提</td></tr>
+      <tr><td><b>N4：MacBook Pro M4 Max 128GB</b></td><td>Apple Silicon、ユニファイドメモリ</td><td>31B Denseで約15トークン/秒。Windows前提の運用・BIOS無効化要件と合わないため参考扱い</td></tr>
     </tbody>
   </table>
   <div class="cards">
@@ -197,7 +195,7 @@
       <h3>デスクトップとの主な違い</h3>
       <ul>
         <li>連続推論時は電力上限と冷却制約により性能が2〜4割低下</li>
-        <li>同じVRAM容量で価格は約1.5〜2倍。GPUの増設・交換は不可</li>
+        <li>GPUの増設・交換は不可。性能向上は買い替えのみ</li>
         <li>RTX 5070 Ti Laptop（12GB）以下はDevstral 24Bが入らず非推奨</li>
       </ul>
     </div>
@@ -249,24 +247,24 @@ at com.example.service.DatabaseAccess.getConnection(DatabaseAccess.java:42)</div
 <!-- 7 -->
 <section class="slide" data-layout="content">
   <header>
-    <span class="kicker">06. 概算費用および導入スケジュール</span>
+    <span class="kicker">06. 作業内容および導入スケジュール</span>
     <h1>PC調達・キッティング・環境構築・初期調整までの一括導入プラン</h1>
-    <p class="sub">初期費用のみ。年間保守（モデル更新・障害対応）はオプションとして別途ご提示します</p>
+    <p class="sub">作業はトータル1人月の工数で1名をアサインし、6週間の期間に配分して実施します</p>
   </header>
   <table>
     <thead>
-      <tr><th style="width:22%">費用項目</th><th>作業内容・詳細内訳</th><th style="width:22%">概算金額（税抜）</th></tr>
+      <tr><th style="width:24%">作業項目</th><th>作業内容・詳細内訳</th></tr>
     </thead>
     <tbody>
-      <tr><td><b>1. ハードウェア調達費</b></td><td>GeForce搭載BTO PC、モニター一式<br>（法人保守契約が必要な場合はRTX PRO搭載機で再見積）</td><td>標準 45〜55万円<br>VRAM 32GB 60〜70万円<br>ノートPC 40〜50万円</td></tr>
-      <tr><td><b>2. キッティング＆環境構築</b></td><td>OSセキュリティ設定（固定IP・LAN内アクセス制限・無線無効化）、推論エンジン（Ollama）とWebUI組み込み、利用者アカウント設定、モデルファイルのハッシュ検証、閉域環境での動作検証</td><td>35〜50万円</td></tr>
-      <tr><td><b>3. プロンプト・UI調整</b></td><td>エラーログ解析用テンプレートプロンプト作成、UI画面カスタマイズ、検証用ログテスト</td><td>15〜25万円</td></tr>
-      <tr><td><b>4. 導入支援・設置作業</b></td><td>現地設置・社内LAN接続設定、各端末からの接続確認、取扱説明書・モデル更新手順書作成、運用レクチャー</td><td>10〜15万円</td></tr>
+      <tr><td><b>1. ハードウェア調達</b></td><td>構成案の確定、GeForce搭載BTO PC・モニター一式の選定と発注<br>（法人保守契約が必要な場合はRTX PRO搭載機を選定）</td></tr>
+      <tr><td><b>2. キッティング＆環境構築</b></td><td>OSセキュリティ設定（固定IP・LAN内アクセス制限・無線無効化）、推論エンジン（Ollama）とWebUI組み込み、利用者アカウント設定、モデルファイルのハッシュ検証、閉域環境での動作検証</td></tr>
+      <tr><td><b>3. プロンプト・UI調整</b></td><td>エラーログ解析用テンプレートプロンプト作成、UI画面カスタマイズ、検証用ログテスト</td></tr>
+      <tr><td><b>4. 導入支援・設置作業</b></td><td>現地設置・社内LAN接続設定、各端末からの接続確認、取扱説明書・モデル更新手順書作成、運用レクチャー</td></tr>
     </tbody>
   </table>
   <div class="total">
-    <span class="label">初期導入費用 合計概算（税抜）</span>
-    <span class="value">標準構成 105〜145万円 ／ VRAM 32GB構成 120〜160万円</span>
+    <span class="label">作業工数</span>
+    <span class="value">トータル1人月（担当者1名をアサイン）</span>
   </div>
   <div class="steps">
     <div class="step"><b>Week 1</b>要件確定・PCハードウェア発注</div>
@@ -275,7 +273,7 @@ at com.example.service.DatabaseAccess.getConnection(DatabaseAccess.java:42)</div
     <div class="step"><b>Week 5</b>ログ解析テスト・受入確認</div>
     <div class="step"><b>Week 6</b>現地設置・各端末からの接続確認・運用レクチャー</div>
   </div>
-  <p class="note">※ 標準スケジュールは全6週間。GPU搭載PCの納期（2〜4週間）や在庫状況により前後します。</p>
+  <p class="note">※ 標準スケジュールは全6週間。ハードウェア納期待ちの期間を含むため、実働1人月を6週間に配分します。GPU搭載PCの納期（2〜4週間）や在庫状況により前後します。</p>
 </section>
 
 <!-- 8 -->
@@ -296,8 +294,8 @@ at com.example.service.DatabaseAccess.getConnection(DatabaseAccess.java:42)</div
     <div class="effect"><div class="num">2</div><div>
       <h3>API従量課金・月額費用ゼロ（費用固定）</h3>
       <ul>
-        <li>API従量課金や月額サブスクリプション費用が発生せず、初期費用のみで社内LAN内の担当者が24時間365日利用可能</li>
-        <li>電気代（高負荷時約300〜600W）と年間保守（オプション）を除き、長期運用のTCOを抑制</li>
+        <li>API従量課金や月額サブスクリプション費用が発生せず、社内LAN内の担当者が24時間365日利用可能</li>
+        <li>利用量が増えても追加費用が発生しないため、長期運用のTCOを抑制</li>
       </ul>
     </div></div>
     <div class="effect"><div class="num">3</div><div>
