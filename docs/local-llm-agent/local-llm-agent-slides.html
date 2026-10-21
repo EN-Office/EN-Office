@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>ローカルLLMエージェント実装例</title>
+<title>ローカルLLMエージェント方式</title>
 <style>
   :root {
     --bg: #e9edf3;
@@ -150,66 +150,65 @@
 <body>
 <div class="progress" id="progress"></div>
 <div class="deck" id="deck">
-
 <!-- 1 -->
 <section class="slide title">
-  <h1>ローカルLLMで動かす<br>エージェント型AIの実装例</h1>
-  <div class="sub">Gemma 4 ＋ Claude Code ／ Codex CLI ／ OpenCode を<br>閉域網（端末室）で使うための構成・設定・実装サンプル</div>
+  <h1>ローカルLLMで動かす<br>エージェント型AIの実現方式</h1>
+  <div class="sub">Gemma 4 × Claude Code ／ Codex CLI ／ OpenCode<br>閉域網（端末室）での接続方式と選定のポイント</div>
   <div class="meta">ローカルLLM構築支援プロジェクト　技術資料　｜　2026年10月</div>
-  <div class="footer"><span>※ 本資料のコマンド・設定値は2026年10月時点の公開情報に基づく例です。搬入するバージョンで要確認。</span><span>1</span></div>
+  <div class="footer"><span>※ 2026年10月時点の公開情報に基づく。搬入するバージョンで要確認。</span><span>1</span></div>
 </section>
 
 <!-- 2 -->
 <section class="slide">
-  <h2>結論：既製のエージェントCLIを「接続先だけ」ローカルLLMに向ける</h2>
-  <p class="lead">Claude Code／Codexのようなエージェントは、LLMをAPI経由で呼ぶ「操縦席」です。<br>APIの接続先を社内LANのローカルLLMサーバに差し替えれば、インターネットなしで動作します。</p>
+  <h2>結論：エージェントCLIの「接続先」をローカルLLMに切り替える</h2>
+  <p class="lead">Claude Code や Codex は、LLMをAPIで呼び出して作業する「操縦席」です。<br>接続先を社内LANのLLMサーバに替えれば、インターネットなしで動きます。</p>
   <div class="body">
-    <div class="cols c3">
+    <div class="cols c3 big" style="flex:none">
       <div class="card hl">
-        <h3><span class="tag">A</span>Claude Code ＋ Gemma 4</h3>
-        <p>Ollama が Anthropic Messages API 互換になったため、環境変数 <code>ANTHROPIC_BASE_URL</code> を差し替えるだけで接続できます。</p>
-        <p class="note">操作感が最も良い。利用規約の確認が前提（p.9）。</p>
+        <h3>LLMサーバ</h3>
+        <p><b>Ollama ＋ Gemma 4</b></p>
+        <p class="note" style="font-size:17px">ローカルLLM用PCで稼働し、APIを端末室LANに公開</p>
       </div>
       <div class="card hl">
-        <h3><span class="tag">B</span>Codex CLI ＋ Gemma 4</h3>
-        <p><code>--oss</code> オプションや <code>config.toml</code> でローカルの Ollama を指定できます。</p>
-        <p class="note">Apache-2.0 のOSS。閉域網へ持ち込みやすい。</p>
+        <h3>エージェントCLI</h3>
+        <p><b>Claude Code ／ Codex CLI ／ OpenCode</b></p>
+        <p class="note" style="font-size:17px">作業用PCで稼働し、接続先URLだけを変更</p>
       </div>
       <div class="card hl">
-        <h3><span class="tag">C</span>OpenCode ＋ Gemma 4</h3>
-        <p>OpenAI 互換APIを持つ任意のLLMを、設定ファイルで登録して使えます。</p>
-        <p class="note">MIT ライセンスのOSS。マルチプロバイダ前提の設計。</p>
+        <h3>業務データ</h3>
+        <p><b>ログ・ソース・過去Q&amp;A</b></p>
+        <p class="note" style="font-size:17px">読み取り専用で参照から開始</p>
       </div>
     </div>
-    <div class="card ok">
-      <b>推奨：</b>フェーズ1では <b>Codex CLI または OpenCode（OSS）を標準</b>とし、Claude Code は規約確認後に比較評価の対象とします。<br>
-      いずれも同じ LLM サーバ（Ollama ＋ Gemma 4）を共有できるため、<b>エージェントは後から何度でも乗り換え可能</b>です。
+    <div class="card ok big">
+      <b>推奨：</b>OSSの <b>Codex CLI または OpenCode を標準</b>とし、Claude Code は規約確認後に比較評価します。<br>
+      LLMサーバは共通なので、<b>エージェントは後から乗り換え可能</b>です。
     </div>
   </div>
-  <div class="footer"><span>ローカルLLMエージェント実装例</span><span>2</span></div>
+  <div class="footer"><span>ローカルLLMエージェントの実現方式</span><span>2</span></div>
 </section>
 
 <!-- 3 -->
 <section class="slide">
   <h2>全体構成（品川データ棟 端末室・閉域網）</h2>
-  <p class="lead">貴社資料 p.2 の「ローカルLLM用PC ＋ 作業用PC」2台構成にそのまま当てはめます。</p>
+  <p class="lead">貴社資料 p.2 の2台構成（ローカルLLM用PC ＋ 作業用PC）にそのまま当てはめます。</p>
   <div class="body">
     <div class="diagram">
       <div class="zone">
         <div class="zt">ローカルLLM用PC</div>
-        <div class="box"><b>Ollama</b>（推論サーバ）<br>:11434 を端末室LANに公開</div>
-        <div class="box"><b>Gemma 4 31B</b>（精度重視）<br><b>Gemma 4 26B-A4B</b>（速度重視）</div>
-        <div class="box">RTX 5060 Ti 16GB ×2<br>VRAM 32GB ／ Ubuntu 24.04</div>
+        <div class="box"><b>Ollama</b>（推論サーバ）</div>
+        <div class="box"><b>Gemma 4</b> 31B ／ 26B-A4B</div>
+        <div class="box">RTX 5060 Ti 16GB ×2</div>
       </div>
-      <div class="arrow"><span>OpenAI互換<br>/v1/chat/completions</span><div class="ln both"></div><span>Anthropic互換<br>/v1/messages</span></div>
+      <div class="arrow"><span>API<br>（端末室LAN）</span><div class="ln both"></div></div>
       <div class="zone">
         <div class="zt">作業用PC</div>
-        <div class="box"><b>エージェント</b>：Claude Code ／ Codex CLI ／ OpenCode</div>
-        <div class="box"><b>指示書</b>：CLAUDE.md ／ AGENTS.md（プロジェクト固有ルール・用語）</div>
-        <div class="box"><b>Tool/Skill</b>：ログ取得・ソース検索・変換定義生成（読み取り専用から開始）</div>
-        <div class="box"><b>RAG</b>：Open WebUI ナレッジ（過去Q&amp;A）</div>
+        <div class="box"><b>エージェントCLI</b></div>
+        <div class="box"><b>指示書</b>（業務ルール・用語）</div>
+        <div class="box"><b>Tool</b>（ログ取得・ソース検索）</div>
+        <div class="box"><b>RAG</b>（過去Q&amp;A）</div>
       </div>
-      <div class="arrow"><span>参照<br>（ssh・読取専用）</span><div class="ln"></div><span>更新は<br>人の承認後</span></div>
+      <div class="arrow"><span>参照<br>（読取専用）</span><div class="ln"></div><span>更新は<br>人の承認後</span></div>
       <div class="zone">
         <div class="zt">FG開発環境</div>
         <div class="box">Amache ログ</div>
@@ -217,505 +216,170 @@
         <div class="box">ソースコード</div>
       </div>
     </div>
-    <p class="note">LLM本体はローカルLLM用PCのみに置き、作業用PCは軽量なクライアントとして動かします。モデルの差し替え・増強はLLM用PC側だけで完結します。</p>
+    <p class="note">LLMはLLM用PCにのみ配置。モデルの差し替え・増強はLLM用PC側だけで完結します。</p>
   </div>
-  <div class="footer"><span>ローカルLLMエージェント実装例</span><span>3</span></div>
+  <div class="footer"><span>ローカルLLMエージェントの実現方式</span><span>3</span></div>
 </section>
 
 <!-- 4 -->
 <section class="slide">
-  <h2>Gemma 4 の概要と、VRAM 32GB でのモデルの選び方</h2>
-  <p class="lead">Google が 2026年4月に公開したオープンモデル。Apache 2.0 ライセンス、関数呼び出し（ツール利用）を標準サポート。</p>
+  <h2>Gemma 4 の概要と選び方（VRAM 32GB）</h2>
+  <p class="lead">Google が2026年4月に公開。Apache 2.0（商用可）、ツール呼び出しに標準対応。</p>
   <div class="body">
     <table>
-      <tr><th>モデル（Ollamaタグ例）</th><th>種別</th><th class="c">コンテキスト</th><th class="c">4bit時の目安</th><th class="c">32GBでの可否</th><th>本PJでの用途</th></tr>
-      <tr><td><b>gemma4:31b-it-qat</b></td><td>Dense 31B</td><td class="c">256K</td><td class="c">約18〜20GB</td><td class="c">◎</td><td>ログ／ソース解析など<b>精度重視のエージェント</b></td></tr>
-      <tr><td><b>gemma4:26b-a4b-it-qat</b></td><td>MoE（動作4B）</td><td class="c">256K</td><td class="c">約15〜17GB</td><td class="c">◎</td><td>Q&amp;Aチャットなど<b>応答速度重視</b></td></tr>
-      <tr><td>gemma4:12b-it-qat</td><td>Dense 12B</td><td class="c">256K</td><td class="c">約8GB</td><td class="c">◎</td><td>軽量タスク・要約・分類</td></tr>
-      <tr><td>gemma4:e4b ／ e2b</td><td>小型</td><td class="c">128K</td><td class="c">約3〜5GB</td><td class="c">◎</td><td>エージェント用途には力不足</td></tr>
+      <tr><th>モデル</th><th>種別</th><th class="c">4bit時の目安</th><th class="c">32GBで</th><th>用途</th></tr>
+      <tr><td><b>Gemma 4 31B</b></td><td>Dense</td><td class="c">約18〜20GB</td><td class="c">◎</td><td>ログ／ソース解析など<b>精度重視</b></td></tr>
+      <tr><td><b>Gemma 4 26B-A4B</b></td><td>MoE</td><td class="c">約15〜17GB</td><td class="c">◎</td><td>Q&amp;Aチャットなど<b>速度重視</b></td></tr>
+      <tr><td>Gemma 4 12B 以下</td><td>小型</td><td class="c">約3〜8GB</td><td class="c">◎</td><td>要約・分類（エージェントには力不足）</td></tr>
     </table>
     <div class="cols">
       <div class="card warn">
-        <h3>コンテキスト長の設定が最重要</h3>
-        <p>エージェントCLIは指示文・ツール定義だけで<b>1〜2万トークン</b>を使います。Ollama の既定値（数K）のままだと指示が切り捨てられ、動作が破綻します。<b>最低32K、推奨64K</b>に設定してください。</p>
+        <h3>コンテキスト長に注意</h3>
+        <p>エージェントは指示文だけで1〜2万トークンを使うため、<b>64K程度に設定</b>が必要です。</p>
       </div>
       <div class="card">
-        <h3>比較候補も同じ手順で試せる</h3>
-        <p>Qwen3.6-27B／35B-A3B、gpt-oss-20b も同じ Ollama で動作します。<b>同一タスクで Gemma 4 と比較評価</b>し、ツール呼び出しの安定性で選定します。</p>
+        <h3>他モデルとの比較</h3>
+        <p>Qwen3.6・gpt-oss も同じ環境で動作します。<b>同一タスクで比較</b>して選定します。</p>
       </div>
     </div>
   </div>
-  <div class="footer"><span>※ VRAM値はKVキャッシュを除く目安。公式モデルカード・Ollamaライブラリで要確認。</span><span>4</span></div>
+  <div class="footer"><span>※ VRAM値は目安。公式モデルカードで要確認。</span><span>4</span></div>
 </section>
 
 <!-- 5 -->
 <section class="slide">
-  <h2>Step 1：ローカルLLM用PCの構築（Ollama ＋ Gemma 4）</h2>
-  <p class="lead">インターネット側の端末で一式を取得し、承認済み媒体で端末室へ搬入します。</p>
+  <h2>接続の仕組み：「API形式」を合わせるだけ</h2>
+  <p class="lead">Ollama は2種類のAPI形式を提供するため、どのCLIもそのまま接続できます。</p>
   <div class="body">
-    <div class="cols">
-      <div>
-        <p class="codecap">① インターネット側でモデルを取得し、搬入物を作成</p>
-<pre><span class="c"># Ollama本体（Linux版tarball）とモデルを取得</span>
-ollama pull gemma4:31b-it-qat
-ollama pull gemma4:26b-a4b-it-qat
-
-<span class="c"># モデル格納ディレクトリを丸ごと固める</span>
-tar czf ollama-models.tgz -C ~/.ollama models
-sha256sum ollama-models.tgz &gt; ollama-models.sha256</pre>
-        <p class="codecap" style="margin-top:12px">② 端末室側：ハッシュ検証 → 展開</p>
-<pre>sha256sum -c ollama-models.sha256
-sudo tar xzf ollama-models.tgz -C /usr/share/ollama/.ollama</pre>
+    <div class="diagram" style="grid-template-columns: 1.1fr 150px 1fr; flex: none;">
+      <div class="zone">
+        <div class="zt">エージェントCLI（作業用PC）</div>
+        <div class="box"><b>Claude Code</b><br>環境変数で接続先URLとモデル名を指定</div>
+        <div class="box"><b>Codex CLI</b><br>ローカルLLM用オプション、または設定ファイルで指定</div>
+        <div class="box"><b>OpenCode</b><br>設定ファイルに接続先を登録</div>
       </div>
-      <div>
-        <p class="codecap">③ LAN公開・コンテキスト長・2GPU利用の設定</p>
-<pre><span class="c"># sudo systemctl edit ollama で以下を追記</span>
-[Service]
-Environment=<span class="s">"OLLAMA_HOST=0.0.0.0:11434"</span>
-Environment=<span class="s">"OLLAMA_CONTEXT_LENGTH=65536"</span>
-Environment=<span class="s">"OLLAMA_KEEP_ALIVE=24h"</span>
-Environment=<span class="s">"OLLAMA_NUM_PARALLEL=2"</span>
-
-sudo systemctl restart ollama</pre>
-        <p class="codecap" style="margin-top:12px">④ 作業用PCから疎通確認</p>
-<pre>curl http://llm-pc:11434/v1/chat/completions \
-  -H <span class="s">"Content-Type: application/json"</span> \
-  -d <span class="s">'{"model":"gemma4:31b-it-qat",
-       "messages":[{"role":"user","content":"こんにちは"}]}'</span></pre>
+      <div class="arrow"><span>Anthropic形式</span><div class="ln"></div><span style="margin-top:18px">OpenAI形式</span><div class="ln"></div></div>
+      <div class="zone">
+        <div class="zt">Ollama（ローカルLLM用PC）</div>
+        <div class="box"><b>Anthropic互換API</b><br>Claude Code が利用</div>
+        <div class="box"><b>OpenAI互換API</b><br>Codex CLI・OpenCode が利用</div>
+        <div class="box">背後で <b>Gemma 4</b> が応答</div>
       </div>
     </div>
-    <p class="note">2枚のGPUへは Ollama（llama.cpp）が自動でレイヤ分割します。<code>nvidia-smi</code> で両GPUにメモリが割り当てられていることを確認します。ファイアウォールで 11434 番は端末室LANからのみ許可してください。</p>
+    <div class="card hl">
+      <b>ポイント：</b>CLI側は「API形式・接続先URL・モデル名」の3点を設定するだけです。プログラムの改修は不要です。
+    </div>
   </div>
-  <div class="footer"><span>ローカルLLMエージェント実装例</span><span>5</span></div>
+  <div class="footer"><span>ローカルLLMエージェントの実現方式</span><span>5</span></div>
 </section>
 
 <!-- 6 -->
-<section class="slide tight">
-  <h2>Step 2-A：Claude Code を Gemma 4 に接続する</h2>
-  <p class="lead">Ollama v0.14 以降は Anthropic Messages API（/v1/messages）互換。ツール呼び出し・ストリーミングにも対応しています。</p>
+<section class="slide">
+  <h2>3つのエージェントCLIの比較</h2>
+  <p class="lead">いずれも同じLLMサーバに接続できます。フェーズ1で同じタスクを試して比較します。</p>
   <div class="body">
-    <div class="cols w">
-      <div>
-        <p class="codecap">作業用PC：環境変数を設定して起動（~/.bashrc 等）</p>
-<pre><span class="c"># 接続先をローカルLLMサーバへ</span>
-<span class="k">export</span> ANTHROPIC_BASE_URL=<span class="s">"http://llm-pc:11434"</span>
-<span class="k">export</span> ANTHROPIC_AUTH_TOKEN=<span class="s">"ollama"</span>   <span class="c"># ダミー値</span>
-<span class="k">export</span> ANTHROPIC_API_KEY=<span class="s">""</span>
-
-<span class="c"># Claude Code が内部で使い分けるモデル階層を割り当て</span>
-<span class="k">export</span> ANTHROPIC_DEFAULT_OPUS_MODEL=<span class="s">"gemma4:31b-it-qat"</span>
-<span class="k">export</span> ANTHROPIC_DEFAULT_SONNET_MODEL=<span class="s">"gemma4:31b-it-qat"</span>
-<span class="k">export</span> ANTHROPIC_DEFAULT_HAIKU_MODEL=<span class="s">"gemma4:26b-a4b-it-qat"</span>
-
-<span class="c"># 閉域網向け：不要な外部通信を止める</span>
-<span class="k">export</span> CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC=1
-
-cd ~/work/fg-analysis
-claude --model gemma4:31b-it-qat</pre>
-      </div>
-      <div style="display:flex;flex-direction:column;gap:14px">
-        <div class="card">
-          <h3>搬入方法</h3>
-          <p>インターネット側で <code>npm pack @anthropic-ai/claude-code</code> を実行して tgz を作成し、端末室で <code>npm install -g ./xxx.tgz</code> します。バージョンによってはネイティブバイナリ配布の場合もあるため、搬入するバージョンの手順に従ってください。</p>
-        </div>
-        <div class="card warn">
-          <h3>注意点</h3>
-          <ul>
-            <li>Claude Code は Anthropic の利用規約の下で提供されるソフトウェアで、<b>他社モデルへの接続は公式サポート外</b>の使い方です。</li>
-            <li>Claude 本体向けに最適化されているため、ローカルモデルではツール呼び出しの失敗が起きやすくなります。</li>
-          </ul>
-        </div>
-      </div>
-    </div>
+    <table>
+      <tr><th style="width:20%">観点</th><th>Claude Code</th><th>Codex CLI</th><th>OpenCode</th></tr>
+      <tr><td>ライセンス</td><td>Anthropic 規約</td><td>Apache-2.0（OSS）</td><td>MIT（OSS）</td></tr>
+      <tr><td>接続方式</td><td>Anthropic互換API</td><td>OpenAI互換API</td><td>OpenAI互換API</td></tr>
+      <tr><td>ローカルLLM対応</td><td>可能（公式サポート外）</td><td>公式に対応</td><td>公式に対応</td></tr>
+      <tr><td>安全機構</td><td>許可リスト・承認</td><td>サンドボックス・承認</td><td>操作ごとの許可設定</td></tr>
+      <tr><td>ローカルモデルとの相性</td><td>△ Claude前提で崩れやすい</td><td>○</td><td>○ モデル切替が容易</td></tr>
+      <tr><td>閉域網への持ち込み</td><td><span class="tag warn">要確認</span>規約・社内審査</td><td><span class="tag ok">容易</span></td><td><span class="tag ok">容易</span></td></tr>
+    </table>
+    <p class="note">指示書（業務ルール）はどのCLIでも共通の内容で使い回せます。</p>
   </div>
-  <div class="footer"><span>参考：docs.ollama.com/api/anthropic-compatibility</span><span>6</span></div>
+  <div class="footer"><span>ローカルLLMエージェントの実現方式</span><span>6</span></div>
 </section>
 
 <!-- 7 -->
 <section class="slide">
-  <h2>Step 2-B：Codex CLI を Gemma 4 に接続する</h2>
-  <p class="lead">Codex CLI は Apache-2.0 のOSSで、ローカルLLM（Ollama 等）への接続を公式に想定しています。</p>
+  <h2>閉域網で導入する際のポイント</h2>
+  <p class="lead">「一度で動く搬入物」を作ることが、手戻りを減らす鍵です。</p>
   <div class="body">
-    <div class="cols">
-      <div>
-        <p class="codecap">簡易起動（同一PC上の Ollama を使う場合）</p>
-<pre>codex --oss -m gemma4:31b-it-qat</pre>
-        <p class="codecap" style="margin-top:14px">~/.codex/config.toml（LAN上のLLM用PCを使う場合）</p>
-<pre>model          = <span class="s">"gemma4:31b-it-qat"</span>
-model_provider = <span class="s">"llmpc"</span>
-
-[model_providers.llmpc]
-name     = <span class="s">"Local LLM PC (Ollama)"</span>
-base_url = <span class="s">"http://llm-pc:11434/v1"</span>
-
-<span class="c"># 安全側の既定値：書き込みは作業ディレクトリ内のみ、</span>
-<span class="c"># コマンド実行は都度承認</span>
-sandbox_mode    = <span class="s">"workspace-write"</span>
-approval_policy = <span class="s">"on-request"</span></pre>
+    <div class="cols c3" style="flex:none">
+      <div class="card">
+        <h3>搬入</h3>
+        <ul>
+          <li>ドライバ・Ollama・モデル・CLIを一括で搬入</li>
+          <li>ハッシュ検証とウイルスチェック</li>
+          <li>オフライン用ドキュメントを同梱</li>
+        </ul>
       </div>
-      <div style="display:flex;flex-direction:column;gap:14px">
-        <div class="card ok">
-          <h3>閉域網での利点</h3>
-          <ul>
-            <li>ライセンスが明快（Apache-2.0）で、社内審査を通しやすい</li>
-            <li>サンドボックス・承認ポリシーが標準装備で、「参照のみ → 承認後に実行」の段階導入と相性が良い</li>
-            <li>指示書は <code>AGENTS.md</code>（OpenCode 等とも共通の形式）</li>
-          </ul>
-        </div>
-        <div class="card">
-          <h3>搬入方法</h3>
-          <p><code>npm pack @openai/codex</code> の tgz、または GitHub Releases の単体バイナリを搬入します。</p>
-        </div>
-        <p class="note">※ 設定キー（API方式の指定など）はバージョンで変わることがあります。搬入するバージョンの docs/config.md を同梱してください。</p>
+      <div class="card">
+        <h3>セキュリティ</h3>
+        <ul>
+          <li>外部通信・自動更新を無効化</li>
+          <li>APIは端末室LAN内のみ公開</li>
+          <li>FG環境へは読み取り専用で接続</li>
+        </ul>
+      </div>
+      <div class="card warn">
+        <h3>ライセンス</h3>
+        <ul>
+          <li>Gemma 4：Apache 2.0</li>
+          <li>Codex CLI・OpenCode：OSS</li>
+          <li>Claude Code：他社モデル利用の可否を事前確認</li>
+        </ul>
       </div>
     </div>
+    <p class="codecap" style="margin:8px 0 -6px;font-size:16px">エージェント権限の段階的な引き上げ</p>
+    <div class="steps">
+      <div class="step"><b>段階1</b>参照のみ</div>
+      <div class="step"><b>段階2</b>提案のみ（差分表示）</div>
+      <div class="step"><b>段階3</b>人の承認後に実行</div>
+      <div class="step"><b>段階4</b>定型作業の自動化</div>
+    </div>
   </div>
-  <div class="footer"><span>ローカルLLMエージェント実装例</span><span>7</span></div>
+  <div class="footer"><span>ローカルLLMエージェントの実現方式</span><span>7</span></div>
 </section>
 
 <!-- 8 -->
 <section class="slide">
-  <h2>Step 2-C：OpenCode を Gemma 4 に接続する</h2>
-  <p class="lead">OpenCode は MIT ライセンスのOSSエージェント。OpenAI 互換APIのモデルを設定ファイルで登録します。</p>
+  <h2>ローカルLLMで安定させるコツ</h2>
+  <p class="lead">クラウドの最上位モデルより推論力が劣る前提で、LLMの負担を減らす設計にします。</p>
   <div class="body">
-    <div class="cols">
-      <div>
-        <p class="codecap">プロジェクト直下の opencode.json</p>
-<pre>{
-  <span class="k">"$schema"</span>: <span class="s">"https://opencode.ai/config.json"</span>,
-  <span class="k">"provider"</span>: {
-    <span class="k">"llmpc"</span>: {
-      <span class="k">"npm"</span>: <span class="s">"@ai-sdk/openai-compatible"</span>,
-      <span class="k">"name"</span>: <span class="s">"Local LLM PC (Ollama)"</span>,
-      <span class="k">"options"</span>: { <span class="k">"baseURL"</span>: <span class="s">"http://llm-pc:11434/v1"</span> },
-      <span class="k">"models"</span>: {
-        <span class="k">"gemma4:31b-it-qat"</span>:     { <span class="k">"name"</span>: <span class="s">"Gemma 4 31B"</span> },
-        <span class="k">"gemma4:26b-a4b-it-qat"</span>: { <span class="k">"name"</span>: <span class="s">"Gemma 4 26B-A4B"</span> }
-      }
-    }
-  },
-  <span class="k">"model"</span>: <span class="s">"llmpc/gemma4:31b-it-qat"</span>,
-  <span class="k">"permission"</span>: { <span class="k">"edit"</span>: <span class="s">"ask"</span>, <span class="k">"bash"</span>: <span class="s">"ask"</span> }
-}</pre>
+    <div class="cols big" style="flex:none">
+      <div class="card ok">
+        <h3>設計の原則</h3>
+        <ul>
+          <li><b>検索・抽出はツールに任せる</b></li>
+          <li><b>タスクを小さく</b>（「直す」より「被疑箇所を挙げる」）</li>
+          <li><b>調査手順を指示書に明記</b></li>
+          <li><b>過去障害で評価</b>し、効果を測る</li>
+        </ul>
       </div>
-      <div style="display:flex;flex-direction:column;gap:14px">
-        <div class="card ok">
-          <h3>特長</h3>
-          <ul>
-            <li>複数のローカルモデルを登録し、<b>画面上で切り替えて比較</b>できる</li>
-            <li>編集・コマンド実行の都度確認（<code>ask</code>）を設定ファイルで固定できる</li>
-            <li>指示書は Codex と同じ <code>AGENTS.md</code></li>
-          </ul>
-        </div>
-        <div class="card warn">
-          <h3>搬入時の注意</h3>
-          <p><code>@ai-sdk/openai-compatible</code> 等のプロバイダパッケージを初回に自動取得しようとします。<b>インターネット側で一度起動してキャッシュを作成し、キャッシュごと搬入</b>してください。</p>
-        </div>
+      <div class="card">
+        <h3>性能の目安（RTX 5060 Ti ×2）</h3>
+        <ul>
+          <li>同時利用は2〜3名程度</li>
+          <li>エージェント処理は1件あたり数分</li>
+          <li>実測はフェーズ1で実施</li>
+        </ul>
       </div>
     </div>
+    <div class="card warn big"><b>Claude Code の注意：</b>Claude向けに最適化されているため、ローカルモデルではツール呼び出しが失敗しやすくなります。</div>
   </div>
-  <div class="footer"><span>ローカルLLMエージェント実装例</span><span>8</span></div>
+  <div class="footer"><span>ローカルLLMエージェントの実現方式</span><span>8</span></div>
 </section>
 
 <!-- 9 -->
 <section class="slide">
-  <h2>3つのエージェントCLIの比較</h2>
-  <p class="lead">いずれも「同じLLMサーバ」に接続できます。フェーズ1で同一タスクを流し、使い勝手と安定性を比較します。</p>
-  <div class="body">
-    <table>
-      <tr><th style="width:20%">観点</th><th>Claude Code</th><th>Codex CLI</th><th>OpenCode</th></tr>
-      <tr><td>ライセンス</td><td>プロプライエタリ（Anthropic 規約）</td><td>Apache-2.0</td><td>MIT</td></tr>
-      <tr><td>接続するAPI</td><td>Anthropic 互換（/v1/messages）</td><td>OpenAI 互換</td><td>OpenAI 互換ほか多数</td></tr>
-      <tr><td>ローカルLLM対応</td><td>環境変数で接続先を変更（公式サポート外）</td><td><code>--oss</code> で公式に想定</td><td>設定ファイルで公式に対応</td></tr>
-      <tr><td>権限・安全機構</td><td>許可リスト・承認モード</td><td>サンドボックス＋承認ポリシー</td><td>ツールごとに allow/ask/deny</td></tr>
-      <tr><td>指示書</td><td>CLAUDE.md</td><td>AGENTS.md</td><td>AGENTS.md</td></tr>
-      <tr><td>閉域網への持ち込み</td><td><span class="tag warn">要確認</span>規約・社内審査</td><td><span class="tag ok">容易</span></td><td><span class="tag ok">容易</span>依存パッケージに注意</td></tr>
-      <tr><td>ローカルモデルとの相性</td><td>Claude 前提の長い指示文で、小型モデルは崩れやすい</td><td>ローカルモデル利用を考慮した設計</td><td>モデルごとにプロンプトを調整可能</td></tr>
-    </table>
-    <p class="note">運用のコツ：CLAUDE.md と AGENTS.md は同じ内容にし、どちらのツールでも同じプロジェクトルールが効くようにします（片方からもう片方を参照させる形でも可）。</p>
-  </div>
-  <div class="footer"><span>ローカルLLMエージェント実装例</span><span>9</span></div>
-</section>
-
-<!-- 10 -->
-<section class="slide">
-  <h2>実装例①：ゴール2「ログ／ソース解析」をエージェントCLIで行う</h2>
-  <p class="lead">指示書（AGENTS.md）で役割・禁止事項・使ってよいコマンドを定義し、読み取り専用で調査させます。</p>
-  <div class="body">
-    <div class="cols">
-      <div>
-        <p class="codecap">~/work/fg-analysis/AGENTS.md（CLAUDE.md も同内容）</p>
-<pre><span class="k"># 役割</span>
-FGサーバ不具合の一次解析を支援する。修正はしない。
-
-<span class="k"># 参照先（読み取り専用）</span>
-- Amacheログ : /mnt/fg-logs/  （ssh読取専用マウント）
-- ソース     : ./src/        （FGサーバのソース一式）
-
-<span class="k"># 手順</span>
-1. ログは grep / tail で該当時刻・例外の周辺だけ読む
-   （ファイル全体を cat しない）
-2. スタックトレースの クラス名:行番号 から ./src を検索
-3. 該当行の前後30行を読み、原因候補を3つまで挙げる
-
-<span class="k"># 禁止事項</span>
-- ファイルの作成・変更・削除、サーバへの書き込み
-- 再起動・デプロイ系コマンド
-
-<span class="k"># 回答形式</span>
-被疑箇所（ファイル:行）／根拠ログ行／原因候補／確認手順</pre>
-      </div>
-      <div>
-        <p class="codecap">実行イメージ</p>
-        <div class="chat">
-          <div class="bubble u">👤 FGサーバからのレスポンスが10:15頃から返ってきません。</div>
-          <div class="bubble t">$ grep -n "Exception" /mnt/fg-logs/amache.log | tail -5<br>8812: java.lang.NullPointerException at Hoge.java:32</div>
-          <div class="bubble t">$ grep -rn "class Hoge" ./src<br>$ sed -n '1,62p' ./src/.../Hoge.java</div>
-          <div class="bubble a">🤖 <b>被疑箇所：</b>Hoge.java 32行目<br><b>根拠：</b>amache.log 8812行目の NullPointerException<br><b>原因候補：</b>セッション取得結果の null チェック漏れ …<br><b>確認手順：</b>10:15前後のリクエストIDで …</div>
-        </div>
-        <p class="note" style="margin-top:10px">コマンド実行は承認制（Codex：on-request ／ OpenCode：ask）。慣れてきたら <code>grep</code>・<code>sed -n</code> 等の読み取り系だけを自動許可にします。</p>
-      </div>
-    </div>
-  </div>
-  <div class="footer"><span>ローカルLLMエージェント実装例</span><span>10</span></div>
-</section>
-
-<!-- 11 -->
-<section class="slide code">
-  <h2>実装例②-1：最小エージェント（ツール定義）</h2>
-  <p class="lead">エージェントの仕組みを理解するためのスキルトランスファー教材です（Python 約50行）。</p>
-  <div class="body">
-    <div class="cols w">
-<pre><span class="k">import</span> json, pathlib, subprocess
-<span class="k">from</span> openai <span class="k">import</span> OpenAI  <span class="c"># 搬入: pip download openai</span>
-
-client = OpenAI(base_url=<span class="s">"http://llm-pc:11434/v1"</span>,
-                api_key=<span class="s">"ollama"</span>)
-MODEL = <span class="s">"gemma4:31b-it-qat"</span>
-LOGS = pathlib.Path(<span class="s">"/mnt/fg-logs"</span>)
-SRC  = pathlib.Path(<span class="s">"/work/src"</span>).resolve()
-
-<span class="k">def</span> grep_log(pattern):
-    r = subprocess.run([<span class="s">"grep"</span>, <span class="s">"-rn"</span>, <span class="s">"-C5"</span>, <span class="s">"--"</span>,
-                        pattern, str(LOGS)],
-                       capture_output=True, text=True,
-                       timeout=30)
-    <span class="k">return</span> r.stdout[-8000:] <span class="k">or</span> <span class="s">"該当なし"</span>  <span class="c"># 量を制限</span>
-
-<span class="k">def</span> read_source(path, start, end):
-    p = (SRC / path).resolve()
-    <span class="k">if</span> SRC <span class="k">not in</span> p.parents:          <span class="c"># 範囲外は拒否</span>
-        <span class="k">return</span> <span class="s">"アクセス不可"</span>
-    lines = p.read_text(errors=<span class="s">"replace"</span>).splitlines()
-    <span class="k">return</span> <span class="s">"\n"</span>.join(<span class="s">f"{i}: {l}"</span> <span class="k">for</span> i, l
-                     <span class="k">in</span> enumerate(lines[start-1:end], start))
-
-FUNCS = {<span class="s">"grep_log"</span>: grep_log, <span class="s">"read_source"</span>: read_source}</pre>
-      <div style="display:flex;flex-direction:column;gap:14px">
-<pre><span class="k">def</span> tool(name, desc, **props):
-    <span class="k">return</span> {<span class="s">"type"</span>: <span class="s">"function"</span>, <span class="s">"function"</span>: {
-        <span class="s">"name"</span>: name, <span class="s">"description"</span>: desc,
-        <span class="s">"parameters"</span>: {<span class="s">"type"</span>: <span class="s">"object"</span>, <span class="s">"properties"</span>: props,
-                       <span class="s">"required"</span>: list(props)}}}
-
-TOOLS = [
-  tool(<span class="s">"grep_log"</span>, <span class="s">"Amacheログを正規表現で検索"</span>,
-       pattern={<span class="s">"type"</span>: <span class="s">"string"</span>}),
-  tool(<span class="s">"read_source"</span>, <span class="s">"ソースの指定行範囲を読む"</span>,
-       path={<span class="s">"type"</span>: <span class="s">"string"</span>},
-       start={<span class="s">"type"</span>: <span class="s">"integer"</span>}, end={<span class="s">"type"</span>: <span class="s">"integer"</span>}),
-]</pre>
-        <div class="card ok">
-          <h3>ツール設計の3原則</h3>
-          <ul>
-            <li><b>読み取り専用</b>：書き込み系の関数は作らない</li>
-            <li><b>出力量の制限</b>：末尾8,000文字までに絞る</li>
-            <li><b>パスの制限</b>：ソース置き場の外は読ませない</li>
-          </ul>
-        </div>
-      </div>
-    </div>
-  </div>
-  <div class="footer"><span>ローカルLLMエージェント実装例</span><span>11</span></div>
-</section>
-
-<!-- 11b -->
-<section class="slide code">
-  <h2>実装例②-2：最小エージェント（エージェントループ）</h2>
-  <p class="lead">LLMがツール呼び出しを要求する限り実行と返却を繰り返し、要求がなくなったら最終回答とします。</p>
-  <div class="body">
-    <div class="cols w">
-<pre><span class="k">def</span> run(question, max_steps=10):
-    msgs = [{<span class="s">"role"</span>: <span class="s">"system"</span>, <span class="s">"content"</span>:
-             <span class="s">"FGサーバ不具合の解析支援。被疑箇所を ファイル:行 で示す。"</span>},
-            {<span class="s">"role"</span>: <span class="s">"user"</span>, <span class="s">"content"</span>: question}]
-    <span class="k">for</span> _ <span class="k">in</span> range(max_steps):
-        msg = client.chat.completions.create(
-            model=MODEL, messages=msgs, tools=TOOLS).choices[0].message
-        msgs.append(msg)
-        <span class="k">if not</span> msg.tool_calls:           <span class="c"># 最終回答</span>
-            <span class="k">return</span> msg.content
-        <span class="k">for</span> c <span class="k">in</span> msg.tool_calls:         <span class="c"># ツール実行</span>
-            out = FUNCS[c.function.name](
-                **json.loads(c.function.arguments))
-            msgs.append({<span class="s">"role"</span>: <span class="s">"tool"</span>,
-                         <span class="s">"tool_call_id"</span>: c.id, <span class="s">"content"</span>: out})
-
-print(run(<span class="s">"10:15頃からFGのレスポンスが返らない"</span>))</pre>
-      <div style="display:flex;flex-direction:column;gap:14px">
-        <div class="card hl">
-          <h3>動作の流れ</h3>
-          <ol style="margin:0;padding-left:1.3em">
-            <li>質問とツール一覧を Gemma 4 に送る</li>
-            <li>Gemma 4 が <code>grep_log("Exception")</code> を要求</li>
-            <li>Python が実行し、結果をそのまま返す</li>
-            <li>Gemma 4 が <code>read_source("…/Hoge.java", 1, 62)</code> を要求</li>
-            <li>ツール要求がなくなったら最終回答を出力</li>
-          </ol>
-        </div>
-        <div class="card">
-          <h3>Claude Code・Codex との関係</h3>
-          <p>既製のエージェントCLIも、本質はこのループです。そこに編集・承認・サンドボックス・履歴管理などの機能が加わっています。</p>
-        </div>
-      </div>
-    </div>
-  </div>
-  <div class="footer"><span>ローカルLLMエージェント実装例</span><span>12</span></div>
-</section>
-
-<!-- 12 -->
-<section class="slide">
-  <h2>実装例③：ゴール1・ゴール2a への展開</h2>
-  <p class="lead">同じ LLM サーバを使い回して、Q&amp;A 回答生成とコンテンツ変換提案にも広げます。</p>
-  <div class="body">
-    <div class="cols">
-      <div class="card">
-        <h3>ゴール1：過去Q&amp;Aから回答案を生成（RAG）</h3>
-        <ul>
-          <li><b>Open WebUI</b> を作業用PCで起動し、接続先を <code>http://llm-pc:11434</code> に設定</li>
-          <li>「ナレッジ」に過去Q&amp;Aを登録（1問1答・日付・対象環境を付けて整形）</li>
-          <li>埋め込みモデルも Ollama で配信（例：bge-m3）</li>
-          <li>システムプロンプトで「<b>根拠としたQ&amp;Aを必ず引用</b>」「該当がなければ不明と答える」を指示</li>
-          <li>「DoCANコード」「1127」等の固有語・数値は、意味検索だけでは外れやすいため<b>キーワード検索を併用</b></li>
-        </ul>
-      </div>
-      <div class="card">
-        <h3>ゴール2a：コンテンツ変換定義の提案</h3>
-        <ul>
-          <li>過去の変換定義（<code>&lt;pattern&gt;&lt;before&gt;…&lt;after&gt;</code>）を <code>./patterns/</code> に置き、エージェントに検索させる</li>
-          <li>AGENTS.md に「類似パターンを3件引用してから新規定義を提案」と記載</li>
-          <li>提案は <b>差分（diff）として出力させ、人がレビュー</b>してからFGのコンテンツ変換環境に反映</li>
-          <li>例：「PDF印刷後に空白Windowが残る」→ <code>window.open(url)</code> を <code>location.href = url</code> に置換する定義を提案</li>
-        </ul>
-      </div>
-    </div>
-    <div class="steps">
-      <div class="step"><b>段階1</b>参照のみ<br>（検索・解析・回答案）</div>
-      <div class="step"><b>段階2</b>提案のみ<br>（差分を出力）</div>
-      <div class="step"><b>段階3</b>承認後に実行<br>（人がOKしたら反映）</div>
-      <div class="step"><b>段階4</b>定型作業の自動化<br>（許可リストの範囲内）</div>
-    </div>
-  </div>
-  <div class="footer"><span>ローカルLLMエージェント実装例</span><span>13</span></div>
-</section>
-
-<!-- 13 -->
-<section class="slide tight">
-  <h2>閉域網で導入する際のチェックリスト</h2>
-  <p class="lead">「一度で動く搬入物」を作ることが、端末室での手戻りを減らす最大のポイントです。</p>
-  <div class="body">
-    <div class="cols">
-      <div class="card">
-        <h3>搬入物リスト（例）</h3>
-        <table>
-          <tr><th>区分</th><th>内容</th></tr>
-          <tr><td class="nw">ドライバ</td><td>NVIDIA Driver ／ CUDA（.run・.deb）</td></tr>
-          <tr><td class="nw">推論サーバ</td><td>Ollama Linux版（tarball）</td></tr>
-          <tr><td class="nw">モデル</td><td>Gemma 4 31B／26B-A4B、埋め込みモデル（約40GB）</td></tr>
-          <tr><td class="nw">エージェント</td><td>Codex CLI ／ OpenCode ／ Claude Code（tgz・バイナリ）</td></tr>
-          <tr><td class="nw">実行環境</td><td>Node.js LTS、Python ＋ wheel 一式</td></tr>
-          <tr><td class="nw">UI・RAG</td><td>Open WebUI（Dockerイメージを docker save で保存）</td></tr>
-          <tr><td class="nw">ドキュメント</td><td>各ツールの公式ドキュメント（オフライン用に保存）</td></tr>
-        </table>
-      </div>
-      <div style="display:flex;flex-direction:column;gap:14px">
-        <div class="card">
-          <h3>セキュリティ</h3>
-          <ul>
-            <li>全搬入物のハッシュ検証とウイルスチェック</li>
-            <li>テレメトリ・自動更新の無効化（例：<code>CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC=1</code>）</li>
-            <li>推論APIは端末室LANからのみアクセス許可</li>
-            <li>FG環境へは読み取り専用アカウントで接続</li>
-          </ul>
-        </div>
-        <div class="card warn">
-          <h3>ライセンス・規約</h3>
-          <ul>
-            <li>Gemma 4：Apache 2.0（商用・社内利用可）</li>
-            <li>Codex CLI：Apache-2.0 ／ OpenCode：MIT</li>
-            <li>Claude Code：Anthropic 規約。他社モデルでの利用可否を事前に確認</li>
-          </ul>
-        </div>
-      </div>
-    </div>
-  </div>
-  <div class="footer"><span>ローカルLLMエージェント実装例</span><span>14</span></div>
-</section>
-
-<!-- 14 -->
-<section class="slide tight">
-  <h2>ローカルLLMでエージェントを安定させるコツ</h2>
-  <p class="lead">クラウドの最上位モデルより推論力が劣る前提で、「LLMに考えさせる量」を減らす設計にします。</p>
-  <div class="body">
-    <div class="cols">
-      <div class="card">
-        <h3>うまくいかない典型例と対策</h3>
-        <table>
-          <tr><th>症状</th><th>対策</th></tr>
-          <tr><td>指示を無視する／途中で止まる</td><td>コンテキスト長が不足しています。64Kに設定してください。</td></tr>
-          <tr><td>ツール呼び出しの書式が崩れる</td><td>量子化を上げる（QAT版・Q5以上）か、31B に切り替えます。</td></tr>
-          <tr><td>ログを丸ごと読んで溢れる</td><td>ツール側で出力を制限します（例：末尾8,000文字まで）。</td></tr>
-          <tr><td>同じ操作を繰り返す</td><td>最大ステップ数を設定し、手順を指示書に明記します。</td></tr>
-          <tr><td>応答が遅い</td><td>軽いタスクは 26B-A4B に振り分けます。</td></tr>
-        </table>
-      </div>
-      <div style="display:flex;flex-direction:column;gap:14px">
-        <div class="card ok">
-          <h3>設計の原則</h3>
-          <ul>
-            <li><b>決定的な処理はツールへ</b>：検索・抽出・整形はスクリプトで行い、LLMは判断と説明に専念させる</li>
-            <li><b>タスクを小さく</b>：「原因を特定して直す」ではなく「被疑箇所を3つ挙げる」</li>
-            <li><b>手順を指示書に書く</b>：熟練者の調査手順を AGENTS.md に落とし込む</li>
-            <li><b>評価セットを作る</b>：過去の障害10件程度で、モデル・設定変更の効果を測る</li>
-          </ul>
-        </div>
-        <div class="card">
-          <h3>性能の目安（RTX 5060 Ti ×2）</h3>
-          <p>同時利用は2〜3名程度まで。エージェントは1タスクで数十回LLMを呼ぶため、<b>1件あたり数分</b>を想定します（実測はフェーズ1で実施）。</p>
-        </div>
-      </div>
-    </div>
-  </div>
-  <div class="footer"><span>ローカルLLMエージェント実装例</span><span>15</span></div>
-</section>
-
-<!-- 15 -->
-<section class="slide">
   <h2>フェーズ別の進め方</h2>
-  <p class="lead">貴社スケジュール（11月〜3月）に合わせた実施内容と、当社のスキルトランスファー範囲です。</p>
+  <p class="lead">貴社スケジュール（11月〜3月）に合わせた進め方です。</p>
   <div class="body">
     <table>
-      <tr><th style="width:16%">フェーズ</th><th style="width:12%">期間</th><th>実施内容（NTTD様）</th><th>当社の支援</th></tr>
-      <tr><td><b>準備</b></td><td>〜10月末</td><td>端末発注、搬入物リストの確定と申請</td><td>搬入物リスト・手順書のテンプレート提供</td></tr>
-      <tr><td><b>1st</b></td><td>11〜12月</td><td>Ollama＋Gemma 4 の構築、Codex CLI／OpenCode の接続、最小エージェントの動作確認</td><td>ハンズオン（本資料 p.5〜12）、性能測定、トラブル対応</td></tr>
-      <tr><td><b>2nd</b></td><td>1〜2月</td><td>AGENTS.md の整備、過去Q&amp;A・変換定義のRAG化、ツール作成、Claude Code 等との比較評価</td><td>RAGチューニング・指示書設計のレクチャ、評価セットの作り方</td></tr>
-      <tr><td><b>3rd</b></td><td>2〜3月</td><td>試行運用、不具合の解消、権限段階の引き上げ判断</td><td>トラブルシューティング、本番DC（三田）展開時の留意点の整理</td></tr>
+      <tr><th style="width:14%">フェーズ</th><th style="width:12%">期間</th><th>実施内容</th><th>当社の支援</th></tr>
+      <tr><td><b>準備</b></td><td>〜10月末</td><td>端末発注、搬入申請</td><td>搬入物リストの提供</td></tr>
+      <tr><td><b>1st</b></td><td>11〜12月</td><td>LLMサーバ構築、CLI接続</td><td>ハンズオン、性能測定</td></tr>
+      <tr><td><b>2nd</b></td><td>1〜2月</td><td>指示書・RAG整備、CLI比較</td><td>チューニングのレクチャ</td></tr>
+      <tr><td><b>3rd</b></td><td>2〜3月</td><td>試行運用、不具合解消</td><td>トラブルシューティング</td></tr>
     </table>
     <div class="card hl big">
-      <b>最初のゴール（12月末）：</b>端末室の作業用PCで <code>codex --oss</code>（または OpenCode）を起動し、Gemma 4 が Amacheログから被疑箇所（ファイル:行）を提示できる状態にする。
+      <b>12月末のゴール：</b>作業用PCのエージェントCLIから Gemma 4 を使い、ログから被疑箇所を提示できること。
     </div>
   </div>
-  <div class="footer"><span>ローカルLLMエージェント実装例</span><span>16</span></div>
+  <div class="footer"><span>ローカルLLMエージェントの実現方式</span><span>9</span></div>
 </section>
 
 </div>
