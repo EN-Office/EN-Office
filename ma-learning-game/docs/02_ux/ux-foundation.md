@@ -1,7 +1,7 @@
 ---
 title: UX基礎設計
 status: review
-version: 0.1
+version: 0.2
 owner: Yu
 updated: 2026-11-03
 related: [docs/01_concept/concept.md, docs/02_ux/learning-map.md, docs/glossary.md]
@@ -9,7 +9,7 @@ related: [docs/01_concept/concept.md, docs/02_ux/learning-map.md, docs/glossary.
 
 # UX基礎設計
 
-前提：方向性は D案「経営シムの骨格 × 企業擬人化モンスター育成」（ADR-0001, proposed）。
+前提：方向性は D案「経営シムの骨格 × 企業擬人化モンスター育成」（ADR-0001, accepted）。
 プラットフォームはスマートフォン縦持ちを仮定（Q-002）。
 
 ## 1. 体験の構造（3層ループ）
@@ -132,3 +132,4 @@ S02 ↔ S11 / S12      （どの画面からも S04・S11 は参照可能）
 | 日付 | 版 | 変更内容 | 変更者 |
 |---|---|---|---|
 | 2026-11-03 | 0.1 | 初版作成 | Claude |
+| 2026-11-03 | 0.2 | ADR-0001承認に伴い前提を更新 | Claude |
