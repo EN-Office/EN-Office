@@ -21,3 +21,4 @@ Claude Code で作業する場合は、まず [CLAUDE.md](CLAUDE.md) を読ん�
 | [用語集](docs/glossary.md) | M&A用語・ゲーム内用語の定義 | draft |
 | [意思決定ログ](decisions/DECISION_LOG.md) | ADR一覧 | — |
 | [未決事項](OPEN_QUESTIONS.md) | 確認待ちの論点 | — |
+| [社内提案書](proposal/proposal.html) | 決定事項をまとめたHTML提案資料（Artifactとして公開） | — |
