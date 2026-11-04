@@ -22,6 +22,7 @@
   color-scheme:dark;
 }
 html,body{height:100%}
+[hidden]{display:none!important}
 *{box-sizing:border-box}
 body{margin:0;background:radial-gradient(120% 80% at 50% 0%,#203f3a 0%,#0a1210 70%);color:#fff;font-family:var(--font-body);
   padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:12px;
@@ -91,7 +92,8 @@ h1,h2,h3,p{margin:0}
 .idx-item:nth-child(3) .n{background:var(--leaf);color:#0b2117}
 .idx-item:nth-child(4) .n{background:#ffd29a}
 .idx-item:nth-child(5) .n{background:#8fb5ff;color:#0b1730}
-.idx-item:nth-child(6) .n{background:var(--rose);color:#fff}
+.idx-item:nth-child(6) .n{background:#b48cff;color:#1d0f3a}
+.idx-item:nth-child(7) .n{background:var(--rose);color:#fff}
 .idx-item .t{font-weight:900;font-size:.95em;line-height:1.35}
 .idx-item .d{font-size:.7em;color:var(--mist);line-height:1.45}
 .idx-item .go{flex:none;color:var(--ember);font-size:1.1em}
@@ -118,6 +120,7 @@ h1,h2,h3,p{margin:0}
 .tile.risk{background:linear-gradient(160deg,#ff8a7a,var(--rose));animation:pop .35s both,shake .35s .35s}
 .tile.good{background:linear-gradient(160deg,#9ce0bd,var(--leaf));color:#0b2117;animation:pop .35s both}
 .tile.safe{background:#2b3a36;color:var(--mist);animation:pop .35s both}
+.tile.flagged{border:2px solid var(--ember);background:rgba(240,161,74,.18)}
 .tile.missed{outline:.15em dashed var(--rose);outline-offset:-.3em}
 .tile .res{font-size:.78em;line-height:1.3;text-align:center;padding:0 .3em}
 .timer{height:.5em;border-radius:99em;background:rgba(255,255,255,.12);overflow:hidden}
@@ -213,6 +216,21 @@ input[type=range]{width:100%;accent-color:var(--ember)}
 .rule b{color:var(--ember-deep)}
 .mix{display:flex;height:1.4em;border-radius:.5em;overflow:hidden;font-size:.6em;font-weight:900}
 .mix span{display:grid;place-items:center;color:#1b1206;white-space:nowrap;overflow:hidden}
+
+/* 用語の補足（！マーク） */
+.term{border-bottom:1px dotted currentColor;cursor:help}
+.q{display:inline-grid;place-items:center;width:1.15em;height:1.15em;margin-left:.15em;border-radius:50%;background:var(--ember);color:#2a1604;font-size:.72em;font-weight:900;font-family:var(--font-body);line-height:1;vertical-align:.25em;cursor:pointer;font-style:normal;text-shadow:none;letter-spacing:0}
+.paper .q,.pcard .q,.bubble .q,.bs .q,.rule .q,.terms .q{background:var(--ember-deep);color:#fff}
+.modal{position:absolute;inset:0;z-index:20;background:rgba(5,12,10,.62);display:flex;align-items:flex-end;font-size:3.9cqw;animation:fade .2s both}
+.sheet{width:100%;background:var(--paper);color:var(--ink);border-radius:1.4em 1.4em 0 0;padding:1.2em 1.2em 1.4em;display:flex;flex-direction:column;gap:.7em;max-height:80%;overflow-y:auto}
+.sheet .hd{display:flex;align-items:flex-start;gap:.7em}
+.sheet .hd .face{flex:none;width:3em;height:3em}
+.sheet .tn{font-family:var(--font-display);font-size:1.4em;line-height:1.25}
+.sheet .en{font-family:var(--font-data);font-size:.72em;color:#5b6b64}
+.sheet .ex{font-size:.92em;line-height:1.75}
+.sheet .gm{font-size:.82em;line-height:1.6;background:#ece2cf;border-radius:.8em;padding:.6em .8em}
+.sheet .gm b{color:var(--ember-deep)}
+.sheet .kind{align-self:flex-start}
 </style>
 
 <div class="stage" id="stage" aria-live="polite"></div>
@@ -225,7 +243,7 @@ let timers=[];
 function clearTimers(){timers.forEach(t=>{clearTimeout(t);clearInterval(t)});timers=[]}
 function later(fn,ms){const t=setTimeout(fn,ms);timers.push(t);return t}
 function every(fn,ms){const t=setInterval(fn,ms);timers.push(t);return t}
-function mount(html,cls){clearTimers();$stage.innerHTML='<div class="screen '+(cls||'')+'">'+html+'</div>';return $stage.firstChild}
+function mount(html,cls){clearTimers();glSeen=new Set();$stage.innerHTML='<div class="screen '+(cls||'')+'">'+html+'</div>';return $stage.firstChild}
 function go(name){if(location.hash.slice(1)===name){route()}else{location.hash=name}}
 function topbar(title,extra){return '<div class="topbar"><button class="back" data-go="" aria-label="目次へ戻る">←</button><div class="ttl">'+title+'</div>'+(extra||'')+'</div>'}
 function bind(root){root.querySelectorAll('[data-go]').forEach(b=>b.addEventListener('click',()=>go(b.dataset.go)))}
@@ -243,7 +261,7 @@ function beast(o){
   const mouth={smile:'<path d="M50 74 Q60 84 70 74" fill="none" stroke="#16251f" stroke-width="4" stroke-linecap="round"/>',
     worry:'<path d="M50 80 Q60 72 70 80" fill="none" stroke="#16251f" stroke-width="4" stroke-linecap="round"/>',
     o:'<ellipse cx="60" cy="78" rx="5" ry="6" fill="#16251f"/>'}[o.mood];
-  return '<svg viewBox="0 0 120 120" aria-hidden="true">'+
+  return '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120" aria-hidden="true">'+
     '<ellipse cx="60" cy="112" rx="38" ry="6" fill="rgba(0,0,0,.25)"/>'+horns+
     '<path d="M18 70 Q18 28 60 28 Q102 28 102 70 Q102 108 60 108 Q18 108 18 70Z" fill="'+o.c+'"/>'+
     '<ellipse cx="60" cy="86" rx="26" ry="18" fill="'+o.belly+'" opacity=".55"/>'+
@@ -297,7 +315,8 @@ function skyline(opts){
 S.index=function(){
   const items=[
     ['opening','オープニング','大陸と企業獣に出会い、最初の本社を建てるまで','約2分'],
-    ['minigame','ミニゲーム「DDスキャン」','20秒で隠れたリスクを暴く、目利きアクション','約1分'],
+    ['minigame','頭脳ゲーム「DDスキャン」','手がかりと数字から、隠れたリスクを推理する','約2分'],
+    ['breaker','アクション「障壁ブレイク」','参入障壁を壊して企業獣を救う。クリア報酬つき','約2分'],
     ['deal','買収フロー体験','町工場マチコウバを、探索から統合まで7ステップで','約5分'],
     ['merit','買収の成功メリット','街の発展、シナジー、ランクアップ','約1分'],
     ['shop','課金ポイント','ループのどこで、何を売るかを見る','約1分']];
@@ -363,61 +382,202 @@ S.opening=function(){
 
 /* ---------- 2. ミニゲーム ---------- */
 S.minigame=function(){
-  const spots=[['🏭','工場'],['📒','経理'],['📜','契約書'],['👥','人事'],['🏦','銀行'],['📦','倉庫'],['🧾','税務'],['🔧','設備'],['🗂','顧客台帳']];
-  const RISKS=[['簿外債務','-0.8億'],['訴訟リスク','-0.6億'],['キーマン依存','-0.5億']];
-  const GOODS=[['特許技術','+スキル'],['優良顧客','+0.3億']];
+  const ROOMS=[['🏭','工場'],['📒','経理'],['📜','契約書'],['👥','人事'],['🚪','社長室'],['🏦','銀行'],['📦','倉庫'],['🧾','税務'],['🗂','顧客台帳']];
+  const PUZ=[
+    {risks:{1:'簿外債務',6:'在庫の水増し',8:'売掛金の焦げつき'},open:[4],
+     clues:['棚卸しの数が、帳簿よりはっきり多い。','社長室の隣のどこかに、帳簿にない借入の書類があるらしい。','大口の取引先からの入金が、半年止まっている。']},
+    {risks:{2:'訴訟リスク',3:'キーマン依存',5:'保証債務'},open:[0],
+     clues:['最近、取引先から内容証明郵便が届いた。','技術の要の工場長が、転職を考えているという噂。','社長が知人の会社の借金を保証しているらしい。']},
+    {risks:{0:'設備の老朽化',5:'簿外債務',7:'追徴課税'},open:[4],
+     clues:['3年前の税務調査の指摘が、まだ片づいていない。','工場の主力機械は、30年前のもの。','金融機関に、決算書に載っていない借入がある。']}
+  ];
+  const NB=i=>{const r=Math.floor(i/3),c=i%3,o=[];if(r>0)o.push(i-3);if(r<2)o.push(i+3);if(c>0)o.push(i-1);if(c<2)o.push(i+1);return o};
   let st;
   function intro(){
     const el=mount(topbar('ミニゲーム')+
-      '<div class="body" style="justify-content:center;text-align:center;gap:1em">'+
-      '<div style="width:44%;margin:0 auto;animation:bob 3s infinite">'+beast(B.misemori)+'</div>'+
-      '<div><p class="label">MINI GAME</p><h2 class="disp" style="font-size:2em;line-height:1.2">DDスキャン</h2></div>'+
-      '<div class="card small" style="text-align:left">9つの調査スポットに<b style="color:var(--ember)">3つのリスク</b>が隠れている。<br>スキャンは<b style="color:var(--ember)">5回</b>、制限時間は<b style="color:var(--ember)">20秒</b>。<br>リスクを見つけるほど、買収価格を下げられる！</div>'+
-      '</div><div class="foot"><button class="btn" id="start">スキャン開始</button></div>','dark');
+      '<div class="body" style="justify-content:center;text-align:center;gap:.9em">'+
+      '<div style="width:40%;margin:0 auto;animation:bob 3s infinite">'+beast(B.misemori)+'</div>'+
+      '<div><p class="label">BRAIN GAME</p><h2 class="disp" style="font-size:2em;line-height:1.2">DDスキャン</h2></div>'+
+      '<div class="card small" style="text-align:left;display:flex;flex-direction:column;gap:.4em">'+
+      '<p>会社の9つの部屋のどこかに、<b style="color:var(--ember)">3つのリスク</b>が隠れている。</p>'+
+      '<p>🔍 <b>調べる</b>：部屋を調査（回数に限りあり）。問題がなければ、<b style="color:var(--ember)">上下左右の部屋にあるリスクの数</b>がわかる。</p>'+
+      '<p>🚩 <b>指摘する</b>：リスクがあると考えた部屋に印をつける。</p>'+
+      '<p>手がかり（資料）と数字から推理して、3つ指摘したら報告！</p></div>'+
+      '</div><div class="foot"><button class="btn" id="start">調査開始</button></div>','dark');
+    bind(el);el.querySelector('#start').addEventListener('click',()=>play(Math.floor(Math.random()*PUZ.length)));
+  }
+  function play(pi){
+    let bonus=0;try{bonus=sessionStorage.getItem('dt-ticket')?1:0}catch(e){}
+    st={p:PUZ[pi],pi,left:4+bonus,bonus,mode:'scan',open:{},flag:{},done:false};
+    st.p.open.forEach(i=>st.open[i]=1);
+    draw();
+  }
+  function cellHTML(i){
+    const P=st.p,r=P.risks[i];
+    if(st.done){
+      if(r)return '<button class="tile '+(st.flag[i]||st.open[i]?'risk':'missed')+'" disabled><span class="ico">'+(st.flag[i]||st.open[i]?'⚠':'?')+'</span><span class="res">'+r+(st.flag[i]||st.open[i]?'':'<br>見逃し')+'</span></button>';
+      if(st.flag[i])return '<button class="tile safe" disabled style="outline:.15em dashed var(--ember);outline-offset:-.3em"><span class="ico">✕</span><span class="res">誤指摘</span></button>';
+    }
+    if(st.open[i]){
+      if(r)return '<button class="tile risk" disabled><span class="ico">⚠</span><span class="res">'+r+'</span></button>';
+      const n=NB(i).filter(j=>P.risks[j]).length;
+      return '<button class="tile safe" disabled><span class="ico" style="font-family:var(--font-display);color:'+(n?'var(--ember)':'var(--leaf)')+'">'+n+'</span><span class="res">'+ROOMS[i][1]+'<br>問題なし</span></button>';
+    }
+    return '<button class="tile'+(st.flag[i]?' flagged':'')+'" data-i="'+i+'"><span class="ico">'+(st.flag[i]?'🚩':ROOMS[i][0])+'</span>'+ROOMS[i][1]+'</button>';
+  }
+  function found(){return Object.keys(st.p.risks).filter(i=>st.open[i]||st.flag[i]).length}
+  function marks(){return Object.keys(st.flag).length+Object.keys(st.p.risks).filter(i=>st.open[i]).length}
+  function draw(){
+    const el=mount(topbar('DDスキャン','<span class="chip">ケース '+(st.pi+1)+'</span>')+
+      '<div class="body">'+
+      '<div class="pcard" style="padding:.7em .8em"><p class="label" style="color:#5b6b64">📁 手がかり（事前資料）</p>'+st.p.clues.map(c=>'<p class="small" style="line-height:1.5">・'+c+'</p>').join('')+'</div>'+
+      '<div class="tabs" style="margin:0"><button class="'+(st.mode==='scan'?'on':'')+'" data-m="scan">🔍 調べる（残り'+st.left+'）</button><button class="'+(st.mode==='flag'?'on':'')+'" data-m="flag">🚩 指摘する（'+marks()+'/3）</button></div>'+
+      (st.bonus?'<p class="xs" style="color:var(--leaf);text-align:center">🎟 調査チケット使用中：調べる回数 +1</p>':'')+
+      '<div class="grid" id="grid">'+ROOMS.map((r,i)=>cellHTML(i)).join('')+'</div>'+
+      '<p class="xs muted" style="text-align:center">数字＝上下左右の部屋にあるリスクの数</p>'+
+      '</div><div class="foot"><button class="btn" id="rep" '+(marks()===3?'':'disabled')+'>報告する</button></div>','dark');
+    bind(el);
+    el.querySelectorAll('[data-m]').forEach(b=>b.addEventListener('click',()=>{st.mode=b.dataset.m;draw()}));
+    el.querySelectorAll('.tile[data-i]').forEach(t=>t.addEventListener('click',()=>act(+t.dataset.i)));
+    el.querySelector('#rep').addEventListener('click',report);
+  }
+  function act(i){
+    if(st.mode==='scan'){
+      if(st.left<=0){toast('調べる回数がありません','');return}
+      if(st.flag[i])delete st.flag[i];
+      st.left--;st.open[i]=1;draw();
+      toast(st.p.risks[i]?'リスク発見！':'問題なし',st.p.risks[i]?'':'g');
+      if(st.left===0&&!st.done&&marks()<3)later(()=>{st.mode='flag';draw()},700);
+    }else{
+      if(st.flag[i])delete st.flag[i];else if(marks()<3)st.flag[i]=1;else{toast('指摘は3つまで','');return}
+      draw();
+    }
+  }
+  function toast(msg,cls){const d=document.createElement('div');d.className='toast '+cls;d.textContent=msg;$stage.firstChild.appendChild(d);later(()=>d.remove(),900)}
+  function report(){st.done=true;draw();$stage.querySelector('.foot').innerHTML='';later(result,1600)}
+  function result(){
+    const f=found(),wrong=Object.keys(st.flag).filter(i=>!st.p.risks[i]).length,scans=4+st.bonus-st.left;
+    const r=f===3&&scans<=3?'S':f===3?'A':f===2?'B':'C';
+    const cut=[0.8,0.6,0.5].slice(0,f).reduce((a,b)=>a+b,0);
+    const msg={S:'少ない調査で全てのリスクを特定！ 推理が冴えています。',A:'全てのリスクを特定できました。次は調べる回数を減らせるかも。',B:'見逃したリスクは買収後に自社が背負います。契約の表明保証で備えましょう。',C:'手がかりと数字を組み合わせて、仮説を立ててから調べてみましょう。'}[r];
+    try{sessionStorage.removeItem('dt-ticket')}catch(e){}
+    const el=mount(topbar('結果')+
+      '<div class="body" style="justify-content:center;gap:1em"><p class="label" style="text-align:center">あなたの目利きランク</p><div class="rank">'+r+'</div>'+
+      '<div class="hud"><div class="card"><p class="label">特定リスク</p><p class="v">'+f+'/3</p></div><div class="card"><p class="label">調査回数</p><p class="v">'+scans+'</p></div><div class="card"><p class="label">価格削減</p><p class="v mono" style="color:var(--leaf)">'+cut.toFixed(1)+'億</p></div></div>'+
+      (wrong?'<p class="xs" style="text-align:center;color:var(--rose)">誤指摘 '+wrong+'件：根拠のない指摘は、売り手の信頼を下げます</p>':'')+
+      '<p class="small" style="text-align:center">'+msg+'</p>'+
+      tip('本物のDDも同じ。資料から<b>仮説</b>を立て、限られた時間で<b>調べる場所を絞る</b>のがプロの仕事です。')+
+      '<div class="terms" style="justify-content:center"><span>📘 デューデリジェンス</span><span>📘 簿外債務</span><span>📘 キーマン依存</span></div></div>'+
+      '<div class="foot"><button class="btn" id="again">別のケースに挑戦</button><button class="btn ghost" data-go="">目次へ戻る</button></div>','dark');
+    bind(el);el.querySelector('#again').addEventListener('click',()=>play((st.pi+1)%PUZ.length));
+  }
+  intro();
+};
+
+/* ---------- 2b. アクション：障壁ブレイク ---------- */
+S.breaker=function(){
+  function intro(){
+    const el=mount(topbar('ミニゲーム')+
+      '<div class="body" style="justify-content:center;text-align:center;gap:.9em">'+
+      '<div style="position:relative;width:52%;margin:0 auto"><div style="animation:bob 3s infinite">'+beast(B.hayate)+'</div>'+
+      '<div style="position:absolute;inset:8% 0 30%;display:grid;grid-template-columns:repeat(4,1fr);gap:3px;opacity:.85">'+Array.from({length:8},(_,i)=>'<span style="border-radius:3px;background:'+['#ef6b5b','#f0a14a','#8fb5ff','#b48cff'][i%4]+'"></span>').join('')+'</div></div>'+
+      '<div><p class="label">ACTION GAME</p><h2 class="disp" style="font-size:2em;line-height:1.2">障壁ブレイク</h2></div>'+
+      '<div class="card small" style="text-align:left;display:flex;flex-direction:column;gap:.35em">'+
+      '<p>買収したい企業獣が、<b style="color:var(--ember)">参入障壁</b>の壁に囲まれている！ ディールボールを跳ね返して、壁を全部壊そう。</p>'+
+      '<p>★のブロックからカプセルが出る：<br><span class="chip" style="background:#8fb5ff;color:#0b1730">FA</span> 拾うとバーが広がる　<span class="chip leaf">資金</span> ボールが3つに</p>'+
+      '<p class="xs muted">操作：ドラッグ／マウスでバーを動かし、タップで発射</p></div>'+
+      '</div><div class="foot"><button class="btn" id="start">スタート</button></div>','dark');
     bind(el);el.querySelector('#start').addEventListener('click',play);
   }
   function play(){
-    const order=spots.map((s,i)=>i).sort(()=>Math.random()-.5);
-    const content={};order.forEach((k,j)=>{content[k]=j<3?['risk'].concat(RISKS[j]):j<5?['good'].concat(GOODS[j-3]):['safe','問題なし','']});
-    st={left:5,time:20,found:0,price:8.0,content,open:{},done:false};
-    const el=mount(topbar('DDスキャン','<span class="chip rose" id="tm">20秒</span>')+
-      '<div class="body"><div class="timer"><i id="tb" style="width:100%"></i></div>'+
-      '<div class="hud"><div class="card"><p class="label">残りスキャン</p><p class="v" id="left">5</p></div><div class="card"><p class="label">発見リスク</p><p class="v" id="found">0/3</p></div><div class="card"><p class="label">買収価格</p><p class="v mono" id="price">8.0</p></div></div>'+
-      '<div class="grid" id="grid">'+spots.map((s,i)=>'<button class="tile" data-i="'+i+'"><span class="ico">'+s[0]+'</span>'+s[1]+'</button>').join('')+'</div>'+
-      tip('怪しいところから調べましょう。<b>全部は調べられません</b>。')+'</div>','dark');
+    const el=mount(topbar('障壁ブレイク','<span class="chip" id="lv">❤❤❤</span><span class="chip ember mono" id="sc">0</span>')+
+      '<div style="flex:1;min-height:0;position:relative;margin:0 .6em .8em;border-radius:1em;overflow:hidden;background:linear-gradient(180deg,#10201c,#173029)"><canvas id="cv" style="position:absolute;inset:0;width:100%;height:100%;touch-action:none"></canvas><div id="msg" style="position:absolute;left:0;right:0;bottom:22%;text-align:center;font-weight:900;color:#ffd29a;animation:glow 1.6s infinite">タップで発射</div></div>','dark');
     bind(el);
-    el.querySelectorAll('.tile').forEach(t=>t.addEventListener('click',()=>scan(+t.dataset.i,t)));
-    every(()=>{if(st.done)return;st.time--;el.querySelector('#tm').textContent=st.time+'秒';el.querySelector('#tb').style.width=(st.time/20*100)+'%';if(st.time<=0)finish()},1000);
-  }
-  function scan(i,t){
-    if(st.done||st.open[i]||st.left<=0)return;
-    st.open[i]=1;st.left--;
-    const c=st.content[i];
-    t.className='tile '+c[0];t.innerHTML='<span class="ico">'+(c[0]==='risk'?'⚠':c[0]==='good'?'★':'—')+'</span><span class="res">'+c[1]+(c[2]?'<br>'+c[2]:'')+'</span>';
-    const root=$stage.firstChild;
-    if(c[0]==='risk'){st.found++;st.price=Math.round((st.price+parseFloat(c[2]))*10)/10;toast('リスク発見！ 価格 '+c[2],'')}
-    else if(c[0]==='good'){toast(c[1]+'を発見','g')}
-    root.querySelector('#left').textContent=st.left;root.querySelector('#found').textContent=st.found+'/3';root.querySelector('#price').textContent=st.price.toFixed(1);
-    if(st.left<=0||st.found>=3)later(finish,700);
-  }
-  function toast(msg,cls){const d=document.createElement('div');d.className='toast '+cls;d.textContent=msg;$stage.firstChild.appendChild(d);later(()=>d.remove(),900)}
-  function finish(){
-    if(st.done)return;st.done=true;
-    const root=$stage.firstChild;
-    root.querySelectorAll('.tile').forEach(t=>{const i=+t.dataset.i;if(!st.open[i]&&st.content[i][0]==='risk'){t.classList.add('missed');t.innerHTML='<span class="ico">?</span><span class="res">見逃し<br>'+st.content[i][1]+'</span>'}});
-    later(result,1300);
-  }
-  function result(){
-    const r=st.found===3?'S':st.found===2?'A':st.found===1?'B':'C';
-    const msg={S:'完璧な目利き！ 全てのリスクを価格に反映できました。',A:'いい調査です。見逃したリスクは契約の「表明保証」で備えましょう。',B:'見逃したリスクは、買収後に自社が背負うことになります。',C:'このまま買うと危険！ 調べる場所の優先順位が大事です。'}[r];
-    const el=mount(topbar('結果')+
-      '<div class="body" style="justify-content:center;gap:1em"><p class="label" style="text-align:center">あなたの目利きランク</p><div class="rank">'+r+'</div>'+
-      '<div class="hud"><div class="card"><p class="label">発見リスク</p><p class="v">'+st.found+'/3</p></div><div class="card"><p class="label">最終価格</p><p class="v mono">'+st.price.toFixed(1)+'億</p></div><div class="card"><p class="label">削減額</p><p class="v mono" style="color:var(--leaf)">'+(8-st.price).toFixed(1)+'億</p></div></div>'+
-      '<p class="small" style="text-align:center">'+msg+'</p>'+
-      tip('これが<b>デューデリジェンス（DD）</b>。限られた時間と予算で、どこを調べるかが勝負です。')+
-      '<div class="terms" style="justify-content:center"><span>📘 デューデリジェンス</span><span>📘 簿外債務</span><span>📘 キーマン依存</span></div></div>'+
-      '<div class="foot"><button class="btn" id="again">もう一度</button><button class="btn ghost" data-go="">目次へ戻る</button></div>','dark');
-    bind(el);el.querySelector('#again').addEventListener('click',play);
+    const cv=el.querySelector('#cv'),ctx=cv.getContext('2d'),dpr=Math.min(2,window.devicePixelRatio||1);
+    const box=cv.getBoundingClientRect();const W=box.width,H=box.height;cv.width=W*dpr;cv.height=H*dpr;ctx.scale(dpr,dpr);
+    const COLS=7,ROWS=6,gap=W*.012,bw=(W-gap*(COLS+1))/COLS,bh=H*.034,top=H*.2;
+    const COL=['#ef6b5b','#f0a14a','#ffd29a','#5fc192','#8fb5ff','#b48cff'];
+    const LBL=['規制','競合','コスト','規制','競合','コスト'];
+    const bricks=[];
+    for(let r=0;r<ROWS;r++)for(let c=0;c<COLS;c++){
+      if((r===0&&(c===0||c===6)))continue;
+      const hard=r<2&&c>=2&&c<=4;
+      const pu=(r===3&&c===1)||(r===4&&c===5)?'W':(r===2&&c===3)||(r===5&&c===2)?'M':null;
+      bricks.push({x:gap+c*(bw+gap),y:top+r*(bh+gap),hp:hard?2:1,c:COL[r],lbl:LBL[r],pu});
+    }
+    const total=bricks.length;
+    const pad={w:W*.24,h:H*.018,x:W/2,y:H*.92};
+    let balls=[],caps=[],lives=3,score=0,launched=false,over=false,wideT=0;
+    const R=W*.018,SPD=H*.62;
+    const img=new Image();img.src='data:image/svg+xml;charset=utf-8,'+encodeURIComponent(beast(B.hayate));
+    function newBall(){balls=[{x:pad.x,y:pad.y-R-2,vx:0,vy:0}];launched=false;el.querySelector('#msg').hidden=false}
+    newBall();
+    function launch(){if(launched||over)return;launched=true;el.querySelector('#msg').hidden=true;const a=-Math.PI/2+(Math.random()*.6-.3);balls[0].vx=SPD*Math.cos(a);balls[0].vy=SPD*Math.sin(a)}
+    function setX(clientX){const b=cv.getBoundingClientRect();pad.x=Math.max(pad.w/2,Math.min(W-pad.w/2,(clientX-b.left)/b.width*W))}
+    cv.addEventListener('pointermove',e=>setX(e.clientX));
+    cv.addEventListener('pointerdown',e=>{setX(e.clientX);launch()});
+    const keys={};const kd=e=>{if(!document.body.contains(cv))return;if(e.key==='ArrowLeft'||e.key==='ArrowRight'){keys[e.key]=e.type==='keydown';e.preventDefault()}if(e.type==='keydown'&&e.key===' '){launch();e.preventDefault()}};
+    window.addEventListener('keydown',kd);window.addEventListener('keyup',kd);
+    function hud(){el.querySelector('#lv').textContent='❤'.repeat(lives)+'♡'.repeat(3-lives);el.querySelector('#sc').textContent=score}
+    let last=performance.now();
+    function step(now){
+      if(!document.body.contains(cv)){window.removeEventListener('keydown',kd);window.removeEventListener('keyup',kd);return}
+      const dt=Math.min(.033,(now-last)/1000);last=now;
+      if(keys.ArrowLeft)pad.x=Math.max(pad.w/2,pad.x-W*1.2*dt);if(keys.ArrowRight)pad.x=Math.min(W-pad.w/2,pad.x+W*1.2*dt);
+      if(wideT>0){wideT-=dt;if(wideT<=0)pad.w=W*.24}
+      if(!launched){balls[0].x=pad.x;balls[0].y=pad.y-R-2}
+      else if(!over){
+        balls.forEach(b=>{
+          b.x+=b.vx*dt;b.y+=b.vy*dt;
+          if(b.x<R){b.x=R;b.vx=Math.abs(b.vx)}if(b.x>W-R){b.x=W-R;b.vx=-Math.abs(b.vx)}if(b.y<R){b.y=R;b.vy=Math.abs(b.vy)}
+          if(b.vy>0&&b.y+R>=pad.y-pad.h/2&&b.y+R<=pad.y+pad.h&&Math.abs(b.x-pad.x)<=pad.w/2+R){
+            const k=(b.x-pad.x)/(pad.w/2);const a=-Math.PI/2+k*1.05;const sp=Math.hypot(b.vx,b.vy);b.vx=sp*Math.cos(a);b.vy=sp*Math.sin(a);b.y=pad.y-pad.h/2-R}
+          for(const br of bricks){if(br.hp<=0)continue;
+            if(b.x+R>br.x&&b.x-R<br.x+bw&&b.y+R>br.y&&b.y-R<br.y+bh){
+              const ox=Math.min(b.x+R-br.x,br.x+bw-(b.x-R)),oy=Math.min(b.y+R-br.y,br.y+bh-(b.y-R));
+              if(ox<oy)b.vx=-b.vx;else b.vy=-b.vy;
+              br.hp--;if(br.hp<=0){score+=100;if(br.pu)caps.push({x:br.x+bw/2,y:br.y,t:br.pu})}else score+=20;
+              hud();break}}
+        });
+        balls=balls.filter(b=>b.y-R<H);
+        caps.forEach(c=>{c.y+=H*.28*dt;if(c.y>pad.y-pad.h&&c.y<pad.y+pad.h&&Math.abs(c.x-pad.x)<pad.w/2+bw*.3){c.got=true;
+          if(c.t==='W'){pad.w=W*.38;wideT=10}else{const b0=balls[0]||{x:pad.x,y:pad.y-R,vx:0,vy:-SPD};const sp=SPD;[-.5,.5].forEach(a=>balls.push({x:b0.x,y:b0.y,vx:sp*Math.sin(a),vy:-sp*Math.cos(a)}))}
+          score+=50;hud()}});
+        caps=caps.filter(c=>!c.got&&c.y<H);
+        if(balls.length===0){lives--;hud();if(lives<=0){over=true;later(()=>end(false),600)}else newBall()}
+        if(bricks.every(b=>b.hp<=0)){over=true;later(()=>end(true),700)}
+      }
+      // draw
+      ctx.clearRect(0,0,W,H);
+      const left=bricks.filter(b=>b.hp>0).length;
+      ctx.globalAlpha=.35+.65*(1-left/total);const s=W*.34;if(img.complete&&img.naturalWidth)ctx.drawImage(img,W/2-s/2,top+(ROWS*(bh+gap))/2-s/2,s,s);ctx.globalAlpha=1;
+      ctx.font='700 '+(bh*.5)+'px "Zen Kaku Gothic New",sans-serif';ctx.textAlign='center';ctx.textBaseline='middle';
+      bricks.forEach(b=>{if(b.hp<=0)return;ctx.fillStyle=b.c;ctx.globalAlpha=b.hp>1?1:.9;roundRect(b.x,b.y,bw,bh,bh*.25);ctx.fill();
+        if(b.hp>1){ctx.strokeStyle='#fff';ctx.lineWidth=2;ctx.stroke()}
+        ctx.globalAlpha=1;ctx.fillStyle='rgba(22,37,31,.75)';ctx.fillText(b.pu?'★':b.lbl,b.x+bw/2,b.y+bh/2+1)});
+      caps.forEach(c=>{ctx.fillStyle=c.t==='W'?'#8fb5ff':'#5fc192';roundRect(c.x-bw*.32,c.y,bw*.64,bh*.9,bh*.45);ctx.fill();ctx.fillStyle='#0b1730';ctx.fillText(c.t==='W'?'FA':'資金',c.x,c.y+bh*.47)});
+      const g=ctx.createLinearGradient(0,pad.y-pad.h,0,pad.y+pad.h);g.addColorStop(0,'#ffc477');g.addColorStop(1,'#c76d14');ctx.fillStyle=g;roundRect(pad.x-pad.w/2,pad.y-pad.h/2,pad.w,pad.h,pad.h/2);ctx.fill();
+      balls.forEach(b=>{ctx.beginPath();ctx.arc(b.x,b.y,R,0,Math.PI*2);ctx.fillStyle='#ffd29a';ctx.fill();ctx.lineWidth=2;ctx.strokeStyle='#c76d14';ctx.stroke()});
+      ctx.fillStyle='rgba(255,255,255,.5)';ctx.font='600 '+(W*.03)+'px "IBM Plex Mono",monospace';ctx.textAlign='left';ctx.fillText('障壁 '+left+'/'+total,8,14);
+      requestAnimationFrame(step);
+    }
+    function roundRect(x,y,w,h,r){ctx.beginPath();ctx.moveTo(x+r,y);ctx.arcTo(x+w,y,x+w,y+h,r);ctx.arcTo(x+w,y+h,x,y+h,r);ctx.arcTo(x,y+h,x,y,r);ctx.arcTo(x,y,x+w,y,r);ctx.closePath()}
+    requestAnimationFrame(step);
+    function end(win){
+      const stars=win?lives:0;
+      if(win){try{sessionStorage.setItem('dt-ticket','1')}catch(e){}}
+      const e=mount(topbar(win?'ステージクリア！':'ゲームオーバー')+
+        '<div class="body" style="justify-content:center;gap:.9em;text-align:center">'+
+        (win?'<div style="width:42%;margin:0 auto;animation:pop .6s both">'+beast(B.hayate)+'</div><p class="disp" style="font-size:1.6em">障壁を突破！</p><p style="font-size:1.6em;color:var(--ember);letter-spacing:.1em">'+'★'.repeat(stars)+'<span style="opacity:.3">'+'★'.repeat(3-stars)+'</span></p>'+
+          '<p class="label">クリア報酬</p>'+
+          '<div class="merit" style="text-align:left"><span class="mi" style="background:#f0a14a">🪙</span><span class="grow"><span class="mt" style="display:block">ディールコイン</span><span class="md" style="display:block">ショップや街づくりに使える</span></span><span class="mv">+'+(200+stars*100)+'</span></div>'+
+          '<div class="merit" style="text-align:left;animation-delay:.15s"><span class="mi" style="background:#5fc192">🎟</span><span class="grow"><span class="mt" style="display:block">調査チケット</span><span class="md" style="display:block">次のDDスキャンで、調べる回数 +1</span></span><span class="mv">×1</span></div>'+
+          '<div class="merit" style="text-align:left;animation-delay:.3s"><span class="mi" style="background:#8fb5ff">📘</span><span class="grow"><span class="mt" style="display:block">用語カード「参入障壁」</span><span class="md" style="display:block">図鑑に登録されました</span></span><span class="mv">NEW</span></div>'+
+          tip('壁を壊して、ハヤテ便に会いに行けるようになりました。<b>調査チケット</b>はDDスキャンで使えます。')
+        :'<div style="width:40%;margin:0 auto">'+beast(Object.assign({},B.hayate,{mood:'worry'}))+'</div><p class="disp" style="font-size:1.4em">壁が厚かった…</p><p class="small">スコア '+score+'</p>'+tip('バーの端で打つと、角度がつけられます。<b>FA</b>カプセルを拾うと楽になりますよ。'))+
+        '</div><div class="foot">'+(win?'<button class="btn" data-go="minigame">DDスキャンでチケットを使う</button>':'<button class="btn" id="again">もう一度</button>')+'<button class="btn ghost" data-go="">目次へ戻る</button></div>','dark');
+      bind(e);const a=e.querySelector('#again');if(a)a.addEventListener('click',play);
+    }
   }
   intro();
 };
@@ -681,6 +841,99 @@ S.shop=function(){
   function item(n,art,nm,ds,pr){return '<div class="item"><span class="pin-n">'+n+'</span><div class="art">'+art+'</div><p class="nm">'+nm+'</p><p class="ds">'+ds+'</p><p class="price">'+pr+'</p></div>'}
   draw();
 };
+
+
+/* ---------- 用語集（！モーダル） ---------- */
+const GL={
+ 'M&A':['M&A','Mergers and Acquisitions','会社どうしの合併や、会社・事業の買収のこと。お金を払って会社の株式や事業を手に入れ、経営する権利を移す取引です。','このゲームのテーマそのもの。企業獣を迎え入れることがM&Aにあたります。'],
+ 'ソーシング':['ソーシング','Sourcing','買収する相手の候補を探すこと。自社の戦略（何を手に入れたいか）に合う会社を見つけるところからM&Aは始まります。','「探索」ステップ。戦略に合う企業獣を選びます。'],
+ '鑑定':['鑑定（バリュエーション）','Valuation','会社の価値をお金に換算すること。純資産法・類似会社比較法・DCF法など、いくつかの方法で価格の目安を出します。','「鑑定レンズ」で価値のレンジを出すステップです。'],
+ '統合':['統合（PMI）','Post Merger Integration','買収した後に、2つの会社の仕組み・文化・人をひとつにまとめていくこと。M&Aの成否はここで決まると言われます。','「統合」ステップ。100日プランで施策を選びます。'],
+ 'デューデリジェンス':['デューデリジェンス（DD）','Due Diligence','買収の前に、相手の会社を詳しく調べること。財務・法務・税務・人事などの専門家が、隠れたリスクや本当の価値を確認します。','調査ボードで、限られた調査チームをどこに割り振るかを決めます。'],
+ 'DD':['DD（デューデリジェンス）','Due Diligence','買収の前に、相手の会社を詳しく調べること。財務・法務・税務・人事などの専門家が、隠れたリスクや本当の価値を確認します。','調べなかった場所のリスクは「？」のまま見えません。'],
+ '財務DD':['財務DD','Financial DD','決算書や資産・負債を調べ、利益が本当か、帳簿に載っていない借金がないかなどを確認する調査。','見つかったお金のリスクは「価格調整」で価格に反映できます。'],
+ '法務DD':['法務DD','Legal DD','契約書、訴訟、許認可などを調べる調査。買収で取引先との契約が切れないかなども確認します。','契約上のリスクは「クロージング条件」などで備えます。'],
+ '人事DD':['人事DD','HR DD','従業員、給与、労務問題、組織などを調べる調査。キーマン（欠かせない人）が残るかも重要な確認点です。','キーマンのリスクは「キーマン条項」や統合施策で備えます。'],
+ '税務DD':['税務DD','Tax DD','過去の税金の申告に問題がないか、買収後に思わぬ税金がかからないかを調べる調査。',''],
+ '簿外債務':['簿外債務','Off-balance-sheet Liabilities','決算書（貸借対照表）に載っていない借金や支払い義務。未払いの残業代や保証の肩代わりなどがあり、DDで見つけることが大切です。','見つけると、その分だけ買収価格を下げられます。'],
+ '未払い残業代':['未払い残業代','Unpaid Overtime','本来払うべきなのに払われていない残業代。買収後に請求されると、買い手の負担になる「簿外債務」の代表例です。','財務DDで発見し、価格調整で手当てします。'],
+ '訴訟リスク':['訴訟リスク','Litigation Risk','裁判を起こされている、または起こされそうな問題。負けると賠償金などで会社の価値が下がります。',''],
+ 'キーマン依存':['キーマン依存','Key Person Dependency','会社の技術や取引が特定の人に頼りきっている状態。その人が辞めると、会社の価値が大きく下がるおそれがあります。',''],
+ 'キーマン条項':['キーマン条項','Key Person Clause','大事な人物が買収後も一定期間会社に残ることを、契約の条件や約束として定めるもの。ゲームでは簡略化した呼び方です。','工場長が残れば、技術が引き継がれます。'],
+ '純資産法':['純資産法','Net Asset Method','会社の資産から負債を引いた「純資産」をもとに価値を出す方法。わかりやすい反面、将来の稼ぐ力は反映されにくい。','鑑定レンズ①。序章〜1章で使います。'],
+ '純資産':['純資産','Net Assets','資産から負債を引いた残り。会社の「正味の持ち物」です。',''],
+ '資産':['資産','Assets','会社が持っている財産。現金、在庫、工場、土地など。',''],
+ '負債':['負債','Liabilities','会社がいずれ返す・払う必要があるもの。借入金や未払金など。','企業獣の「重り」として表現されます。'],
+ '時価':['時価','Fair Value','いま売ったらいくらになるか、という現在の値段。帳簿の値段（簿価）とずれていることがあります。',''],
+ '含み益':['含み益','Unrealized Gain','買ったときより今の値段が上がっていて、まだ売っていない利益。古くから持っている土地などで生まれやすい。',''],
+ '将来の稼ぐ力':['将来の稼ぐ力（のれん）','Goodwill','技術・ブランド・顧客など、決算書に載らない「これから稼ぐ力」。買収価格が時価純資産を上回った部分は「のれん」として計上されます。','高く払いすぎると、後で「減損」として損失になることも。'],
+ '適正レンジ':['適正レンジ','Valuation Range','鑑定の結果から出した「このくらいが妥当」という価格の幅。M&Aの価格はひとつの正解ではなく幅で考えます。',''],
+ '基本合意書':['基本合意書（MOU）','Memorandum of Understanding','本格的な調査（DD）の前に、価格の目安やスケジュール、独占して交渉する権利などを確認しあう書面。','合意すると、DDに進めます。'],
+ 'MOU':['MOU（基本合意書）','Memorandum of Understanding','本格的な調査（DD）の前に、価格の目安やスケジュール、独占して交渉する権利などを確認しあう書面。',''],
+ '株式譲渡契約':['株式譲渡契約（SPA）','Share Purchase Agreement','株式を売り買いする最終的な契約。価格、支払い方法、表明保証、条件などを細かく定めます。','条項カードをはめて完成させます。'],
+ 'SPA':['SPA（株式譲渡契約）','Share Purchase Agreement','株式を売り買いする最終的な契約。価格、支払い方法、表明保証、条件などを細かく定めます。',''],
+ '表明保証':['表明保証','Representations and Warranties','売り手が「会社についてのこの説明は正しい」と契約で約束すること。後で違っていたら、補償を求める根拠になります。','見逃したリスクへの保険のような役割です。'],
+ '補償':['補償','Indemnification','表明保証が事実と違っていたときなどに、売り手が買い手の損を埋め合わせること。',''],
+ '価格調整':['価格調整','Price Adjustment','DDで見つかった問題や、契約から実行までの変化に応じて買収価格を見直す仕組み。','見つけたお金のリスクを価格から差し引けます。'],
+ 'クロージング条件':['クロージング条件','Conditions Precedent','買収を実行する前に満たしておくべき条件。たとえば「主要取引先から契約継続の同意をもらうこと」など。',''],
+ 'クロージング':['クロージング','Closing','契約にもとづいて代金を払い、株式を受け取って、買収を実際に完了させること。',''],
+ '経営者が変わったら解約できる':['チェンジ・オブ・コントロール条項','Change of Control Clause','会社の持ち主（支配権）が変わったら、相手が契約を解除できるという取り決め。M&Aで取引先を失う原因になります。','法務DDで見つけ、クロージング条件で備えます。'],
+ '100日プラン':['100日プラン','100-Day Plan','買収後およそ100日の間に行う統合の計画。最初の数か月の動き方が、従業員の信頼やシナジーを大きく左右します。',''],
+ 'シナジー':['シナジー','Synergy','ふたつの会社が一緒になることで、別々のときの合計以上の価値が生まれる効果。売上が伸びる「売上シナジー」とコストが下がる「コストシナジー」があります。','相性の良い会社を隣に置くと大きくなります。'],
+ 'グループ企業価値':['グループ企業価値','Group Value','あなたのグループ全体の価値を表すゲーム内スコア。現実の企業価値の考え方を簡略化しています。','街の規模や景観に反映されます。'],
+ '企業価値':['企業価値','Enterprise Value','会社の事業が生み出す価値全体。株主のもの（株式価値）と、お金を貸している人のもの（純有利子負債）を合わせた価値です。',''],
+ '後継者':['事業承継','Business Succession','経営者が会社を次の世代に引き継ぐこと。後継者がいない会社が、M&Aで別の会社に引き継がれるケースが増えています。','序章・1章のテーマです。'],
+ '後継ぎ':['事業承継','Business Succession','経営者が会社を次の世代に引き継ぐこと。後継者がいない会社が、M&Aで別の会社に引き継がれるケースが増えています。',''],
+ 'アドバイザー':['アドバイザー（FA）','Financial Advisor','M&Aで買い手か売り手の一方につき、相手探し・価値の算定・交渉などを手伝う専門家。','ミナトはあなた専属のアドバイザーです。'],
+ 'ディールメーカー':['ディールメーカー','Deal Maker','M&Aなどの取引（ディール）をまとめる人。','あなたのことです。'],
+ 'アナリスト':['アナリスト','Analyst','投資銀行などでの若手の役職名。資料作成や分析を担当します。','ゲーム内ランクの最初の段階です。'],
+ 'アソシエイト':['アソシエイト','Associate','アナリストの一つ上の役職。案件の実務をまとめる立場です。','ゲーム内ランクの2段階目です。'],
+ 'TOB':['TOB（株式公開買付け）','Takeover Bid','上場会社の株を、期間・価格・数を公表して市場の外で多くの株主から買い集める方法。金融商品取引法でルールが決められています。','後半の章や追加ケースで登場予定です。'],
+ '企業獣':['企業獣（カンパニー・ビースト）','Company Beast','このゲームの世界で、会社を生き物として表した存在。業種で姿が変わり、売上や利益がステータスになります。','いつでも本当の数字（財務）に切り替えて見られる設計です。'],
+ '探索':['探索（ソーシング）','Sourcing','買収する相手の候補を探すこと。自社の戦略（何を手に入れたいか）に合う会社を見つけるところからM&Aは始まります。','戦略に合う企業獣を選ぶステップです。'],
+ '参入障壁':['参入障壁','Barriers to Entry','新しい市場に入ろうとする会社をはばむ壁。規制・許認可、強い競合、大きな初期投資などがあります。M&Aは、すでに市場にいる会社を買うことで、この壁を越える方法のひとつです。','障壁ブレイクのブロックがこれです。'],
+ 'FA':['FA（フィナンシャル・アドバイザー）','Financial Advisor','M&Aで買い手か売り手の一方につき、相手探し・価値の算定・交渉などを手伝う専門家。','拾うとバーが広がります。'],
+ '在庫の水増し':['在庫の水増し','Inflated Inventory','実際より在庫を多く見せかけること。利益や資産が実態より大きく見えるため、買い手は高く払いすぎるおそれがあります。',''],
+ '売掛金の焦げつき':['売掛金の焦げつき','Bad Receivables','売ったのに代金を回収できない状態。帳簿上は資産でも、実際には価値がないことがあります。',''],
+ '保証債務':['保証債務','Guarantee Obligations','他人の借金の保証人になっていることによる支払い義務。相手が返せないと、代わりに払う必要があります。簿外債務になりやすい代表例です。',''],
+ '追徴課税':['追徴課税','Additional Tax Assessment','税務調査などで申告の誤りを指摘され、あとから追加で納める税金。買収後に発生すると買い手の負担になります。',''],
+ '設備の老朽化':['設備の老朽化','Aging Equipment','機械や建物が古くなり、近いうちに大きな更新投資が必要になる状態。将来のお金の出ていきとして価格に影響します。',''],
+ 'なつき度':['なつき度','Employee Engagement','従業員が会社にどれだけ前向きに関わっているかを表すゲーム内の指標。現実の「従業員エンゲージメント」にあたります。','下がると人材が流出します。']
+};
+const GL_RE=new RegExp(Object.keys(GL).sort((a,b)=>b.length-a.length).map(k=>k.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')).join('|'),'g');
+let glSeen=new Set();
+function markTerms(root){
+  const w=document.createTreeWalker(root,NodeFilter.SHOW_TEXT,{acceptNode(n){
+    const p=n.parentElement;if(!p||p.closest('svg,.term,.modal,.logo,.rank,.back,script,style,.mono,.price,.ticks,h2.disp,.ttl,.idx-item .t'))return NodeFilter.FILTER_REJECT;
+    GL_RE.lastIndex=0;return GL_RE.test(n.nodeValue)?NodeFilter.FILTER_ACCEPT:NodeFilter.FILTER_REJECT}});
+  const nodes=[];while(w.nextNode())nodes.push(w.currentNode);
+  nodes.forEach(n=>{
+    const txt=n.nodeValue;let last=0,m,frag=document.createDocumentFragment(),changed=false;GL_RE.lastIndex=0;
+    while((m=GL_RE.exec(txt))){
+      const key=m[0];if(glSeen.has(key))continue;glSeen.add(key);changed=true;
+      frag.appendChild(document.createTextNode(txt.slice(last,m.index)));
+      const sp=document.createElement('span');sp.className='term';sp.dataset.term=key;sp.textContent=key;
+      const q=document.createElement('span');q.className='q';q.dataset.term=key;q.setAttribute('role','button');q.setAttribute('tabindex','0');q.setAttribute('aria-label',key+'の説明');q.textContent='!';
+      sp.appendChild(q);frag.appendChild(sp);last=m.index+key.length;
+    }
+    if(!changed)return;frag.appendChild(document.createTextNode(txt.slice(last)));n.parentNode.replaceChild(frag,n);
+  });
+}
+function openTerm(key){
+  const g=GL[key];if(!g)return;
+  const m=document.createElement('div');m.className='modal';
+  m.innerHTML='<div class="sheet" role="dialog" aria-modal="true" aria-label="'+g[0]+'"><div class="hd"><div class="face">'+minato()+'</div><div class="grow"><span class="chip ember kind">用語カード</span><p class="tn" style="margin-top:.3em">'+g[0]+'</p><p class="en">'+g[1]+'</p></div></div>'+
+    '<p class="ex">'+g[2]+'</p>'+(g[3]?'<p class="gm"><b>ゲームでは</b>　'+g[3]+'</p>':'')+'<button class="btn" data-close>わかった</button></div>';
+  $stage.appendChild(m);m.querySelector('[data-close]').focus();
+  m.addEventListener('click',e=>{if(e.target===m||e.target.closest('[data-close]')){e.stopPropagation();m.remove()}});
+}
+$stage.addEventListener('click',e=>{
+  const q=e.target.closest('.q')||(!e.target.closest('button')&&e.target.closest('.term'));
+  if(q){e.stopPropagation();e.preventDefault();openTerm(q.dataset.term)}
+},true);
+$stage.addEventListener('keydown',e=>{const q=e.target.closest&&e.target.closest('.q');if(q&&(e.key==='Enter'||e.key===' ')){e.preventDefault();e.stopPropagation();openTerm(q.dataset.term)}
+  if(e.key==='Escape'){const m=$stage.querySelector('.modal');if(m)m.remove()}},true);
+new MutationObserver(ms=>{ms.forEach(r=>r.addedNodes.forEach(n=>{if(n.nodeType===1&&!n.closest('.modal')&&!n.classList.contains('term'))markTerms(n)}))}).observe($stage,{childList:true,subtree:true});
 
 /* ---------- ルーティング ---------- */
 function route(){const h=location.hash.slice(1);(S[h]||S.index)()}
