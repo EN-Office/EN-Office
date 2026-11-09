@@ -1,0 +1,21 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "チュートリアルを起動",
+      "type": "shell",
+      "command": "npm start",
+      "isBackground": true,
+      "problemMatcher": {
+        "owner": "deal-tamers",
+        "pattern": { "regexp": "^__never__$" },
+        "background": {
+          "activesBegin": ".",
+          "beginsPattern": "^.*$",
+          "endsPattern": "起動しました"
+        }
+      },
+      "group": { "kind": "build", "isDefault": true }
+    }
+  ]
+}
