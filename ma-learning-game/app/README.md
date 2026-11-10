@@ -7,6 +7,8 @@
 2. このリポジトリを手元に取得し、VS Code で **`ma-learning-game` フォルダ**を開く（ファイル → フォルダーを開く）。
 
 ## 起動方法
+- **Windows でいちばん簡単な方法**：`ma-learning-game` フォルダの `start-windows.bat` をダブルクリック。ブラウザで http://localhost:5173 が開きます（終了は黒い画面を閉じる）。
+- **Node.js なしで見るだけ**：`mockup/index.html` をダブルクリックしてブラウザで開く。
 - **F5 キー**：サーバーが起動し、Chrome で http://localhost:5173 が開きます（Edge を使う場合は、実行とデバッグ画面で「チュートリアルを開く（Edge）」を選ぶ）。
 - **ターミナルから**：`npm start` を実行し、表示された http://localhost:5173 をブラウザで開く。
 
