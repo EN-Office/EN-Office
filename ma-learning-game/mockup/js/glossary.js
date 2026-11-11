@@ -1,5 +1,5 @@
 'use strict';
-/* ---------- 用語集（！モーダル） ---------- */
+/* ---------- 用語集（「？」ボタン＋用語モーダル） ---------- */
 const GL={
  'M&A':['M&A','Mergers and Acquisitions','会社どうしの合併や、会社・事業の買収のこと。お金を払って会社の株式や事業を手に入れ、経営する権利を移す取引です。','このゲームのテーマそのもの。企業獣を迎え入れることがM&Aにあたります。'],
  'ソーシング':['ソーシング','Sourcing','買収する相手の候補を探すこと。自社の戦略（何を手に入れたいか）に合う会社を見つけるところからM&Aは始まります。','「探索」ステップ。戦略に合う企業獣を選びます。'],
@@ -22,7 +22,8 @@ const GL={
  '負債':['負債','Liabilities','会社がいずれ返す・払う必要があるもの。借入金や未払金など。','企業獣の「重り」として表現されます。'],
  '時価':['時価','Fair Value','いま売ったらいくらになるか、という現在の値段。帳簿の値段（簿価）とずれていることがあります。',''],
  '含み益':['含み益','Unrealized Gain','買ったときより今の値段が上がっていて、まだ売っていない利益。古くから持っている土地などで生まれやすい。',''],
- '将来の稼ぐ力':['将来の稼ぐ力（のれん）','Goodwill','技術・ブランド・顧客など、決算書に載らない「これから稼ぐ力」。買収価格が時価純資産を上回った部分は「のれん」として計上されます。','高く払いすぎると、後で「減損」として損失になることも。'],
+ '将来の稼ぐ力':['将来の稼ぐ力（収益力）','Earning Power','会社がこれから利益を生み出す力。技術・ブランド・顧客などは決算書の資産に載りにくく、純資産法だけでは価値に表れません。','鑑定では、時価純資産にこの分を上乗せして価格の幅を考えます。'],
+ 'のれん':['のれん','Goodwill','買収価格が、買収した会社の純資産の時価（資産と負債を時価で評価した差額）を上回る部分。将来の稼ぐ力やシナジーへの期待が背景にあり、買い手の連結決算で資産として計上されます（企業結合に関する会計基準）。','日本の会計基準では20年以内で償却し、価値が下がれば「減損」として損失になります。高く払いすぎに注意。'],
  '適正レンジ':['適正レンジ','Valuation Range','鑑定の結果から出した「このくらいが妥当」という価格の幅。M&Aの価格はひとつの正解ではなく幅で考えます。',''],
  '基本合意書':['基本合意書（MOU）','Memorandum of Understanding','本格的な調査（DD）の前に、価格の目安やスケジュール、独占して交渉する権利などを確認しあう書面。','合意すると、DDに進めます。'],
  'MOU':['MOU（基本合意書）','Memorandum of Understanding','本格的な調査（DD）の前に、価格の目安やスケジュール、独占して交渉する権利などを確認しあう書面。',''],
@@ -55,37 +56,51 @@ const GL={
  '設備の老朽化':['設備の老朽化','Aging Equipment','機械や建物が古くなり、近いうちに大きな更新投資が必要になる状態。将来のお金の出ていきとして価格に影響します。',''],
  'なつき度':['なつき度','Employee Engagement','従業員が会社にどれだけ前向きに関わっているかを表すゲーム内の指標。現実の「従業員エンゲージメント」にあたります。','下がると人材が流出します。']
 };
-const GL_RE=new RegExp(Object.keys(GL).sort((a,b)=>b.length-a.length).map(k=>k.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')).join('|'),'g');
+/* 「？」とモーダルを出すのは専門用語だけ（ui-guidelines 3.3）。他の項目はデータとして残すが自動では印をつけない */
+const GL_MARK=['デューデリジェンス','DD','純資産法','含み益','基本合意書','MOU','株式譲渡契約','SPA','表明保証','価格調整','クロージング条件','キーマン条項','簿外債務','100日プラン','シナジー','のれん','TOB'].filter(k=>GL[k]);
+const GL_RE=new RegExp(GL_MARK.slice().sort((a,b)=>b.length-a.length).map(k=>k.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')).join('|'),'g');
+const GL_ALIAS={'DD':'デューデリジェンス','デューデリジェンス':'DD','MOU':'基本合意書','基本合意書':'MOU','SPA':'株式譲渡契約','株式譲渡契約':'SPA'};
 let glSeen=new Set();
+function sfx(name){try{SFX.play(name)}catch(e){}}
 function markTerms(root){
   const w=document.createTreeWalker(root,NodeFilter.SHOW_TEXT,{acceptNode(n){
-    const p=n.parentElement;if(!p||p.closest('svg,.term,.modal,.logo,.rank,.back,script,style,.mono,.price,.ticks,h2.disp,.ttl,.idx-item .t'))return NodeFilter.FILTER_REJECT;
+    const p=n.parentElement;if(!p||p.closest('button,a,input,label,svg,.term,.q,.modal,.logo,.rank,script,style,.mono,.price,.ticks,.disp,.stepname,.ttl,.chip,.label,.big'))return NodeFilter.FILTER_REJECT;
     GL_RE.lastIndex=0;return GL_RE.test(n.nodeValue)?NodeFilter.FILTER_ACCEPT:NodeFilter.FILTER_REJECT}});
   const nodes=[];while(w.nextNode())nodes.push(w.currentNode);
   nodes.forEach(n=>{
     const txt=n.nodeValue;let last=0,m,frag=document.createDocumentFragment(),changed=false;GL_RE.lastIndex=0;
     while((m=GL_RE.exec(txt))){
-      const key=m[0];if(glSeen.has(key))continue;glSeen.add(key);changed=true;
+      const key=m[0];
+      /* 英字の略語は単語の一部（例：DDスキャン、財務DD）には印をつけない */
+      if(/^[A-Z]+$/.test(key)){const b=txt[m.index-1]||'',a=txt[m.index+key.length]||'';if(/[A-Za-z0-9ァ-ヶー一-鿿]/.test(b)||/[A-Za-z0-9ァ-ヶー]/.test(a))continue}
+      if(glSeen.has(key))continue;glSeen.add(key);if(GL_ALIAS[key])glSeen.add(GL_ALIAS[key]);changed=true;
       frag.appendChild(document.createTextNode(txt.slice(last,m.index)));
-      const sp=document.createElement('span');sp.className='term';sp.dataset.term=key;sp.textContent=key;
-      const q=document.createElement('span');q.className='q';q.dataset.term=key;q.setAttribute('role','button');q.setAttribute('tabindex','0');q.setAttribute('aria-label',key+'の説明');q.textContent='!';
+      const sp=document.createElement('span');sp.className='term';sp.textContent=key;
+      const q=document.createElement('button');q.type='button';q.className='q';q.dataset.term=key;q.dataset.sfx='none';q.setAttribute('aria-label',key+'の説明');q.textContent='？';
       sp.appendChild(q);frag.appendChild(sp);last=m.index+key.length;
     }
     if(!changed)return;frag.appendChild(document.createTextNode(txt.slice(last)));n.parentNode.replaceChild(frag,n);
   });
 }
-function openTerm(key){
+function closeTerm(m){
+  if(!m||!m.isConnected)return;sfx('close');m.remove();
+  if(m._from&&m._from.isConnected)try{m._from.focus({preventScroll:true})}catch(e){}
+}
+function openTerm(key,from){
   const g=GL[key];if(!g)return;
-  const m=document.createElement('div');m.className='modal';
+  const m=document.createElement('div');m.className='modal term-modal';m._from=from||null;
   m.innerHTML='<div class="sheet" role="dialog" aria-modal="true" aria-label="'+g[0]+'"><div class="hd"><div class="face">'+minato()+'</div><div class="grow"><span class="chip ember kind">用語カード</span><p class="tn" style="margin-top:.3em">'+g[0]+'</p><p class="en">'+g[1]+'</p></div></div>'+
-    '<p class="ex">'+g[2]+'</p>'+(g[3]?'<p class="gm"><b>ゲームでは</b>　'+g[3]+'</p>':'')+'<button class="btn" data-close>わかった</button></div>';
-  $stage.appendChild(m);m.querySelector('[data-close]').focus();
-  m.addEventListener('click',e=>{if(e.target===m||e.target.closest('[data-close]')){e.stopPropagation();m.remove()}});
+    '<p class="ex">'+g[2]+'</p>'+(g[3]?'<p class="gm"><b>ゲームでは</b>　'+g[3]+'</p>':'')+'<button class="btn" data-close data-sfx="none">わかった</button></div>';
+  $stage.appendChild(m);sfx('open');m.querySelector('[data-close]').focus({preventScroll:true});
+  m.addEventListener('click',e=>{if(e.target===m||e.target.closest('[data-close]')){e.stopPropagation();closeTerm(m)}});
 }
 $stage.addEventListener('click',e=>{
-  const q=e.target.closest('.q')||(!e.target.closest('button')&&e.target.closest('.term'));
-  if(q){e.stopPropagation();e.preventDefault();openTerm(q.dataset.term)}
+  const q=e.target.closest&&e.target.closest('.q');
+  if(q&&!q.closest('.modal')){e.stopPropagation();e.preventDefault();openTerm(q.dataset.term,q)}
 },true);
-$stage.addEventListener('keydown',e=>{const q=e.target.closest&&e.target.closest('.q');if(q&&(e.key==='Enter'||e.key===' ')){e.preventDefault();e.stopPropagation();openTerm(q.dataset.term)}
-  if(e.key==='Escape'){const m=$stage.querySelector('.modal');if(m)m.remove()}},true);
+$stage.addEventListener('keydown',e=>{
+  if(e.key!=='Escape')return;
+  const t=$stage.querySelector('.term-modal');if(t){e.stopPropagation();closeTerm(t);return}
+  const m=$stage.querySelector('.modal');if(m)m.remove();
+},true);
 new MutationObserver(ms=>{ms.forEach(r=>r.addedNodes.forEach(n=>{if(n.nodeType===1&&!n.closest('.modal')&&!n.classList.contains('term'))markTerms(n)}))}).observe($stage,{childList:true,subtree:true});

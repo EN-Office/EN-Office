@@ -5,9 +5,17 @@ let timers=[];
 function clearTimers(){timers.forEach(t=>{clearTimeout(t);clearInterval(t)});timers=[]}
 function later(fn,ms){const t=setTimeout(fn,ms);timers.push(t);return t}
 function every(fn,ms){const t=setInterval(fn,ms);timers.push(t);return t}
-function mount(html,cls){clearTimers();glSeen=new Set();$stage.innerHTML='<div class="screen '+(cls||'')+'">'+html+'</div>';return $stage.firstChild}
+function mount(html,cls){
+  clearTimers();try{glSeen=new Set()}catch(e){}
+  $stage.innerHTML='<div class="screen '+(cls||'')+'">'+html+'</div>';
+  const el=$stage.firstChild;
+  try{if(typeof Kit3D!=='undefined'&&Kit3D&&typeof Kit3D.scan==='function'){const r=Kit3D.scan(el);if(r&&typeof r.catch==='function')r.catch(()=>{})}}catch(e){}
+  return el;
+}
 function go(name){if(location.hash.slice(1)===name){route()}else{location.hash=name}}
-function topbar(title,extra,back){return '<div class="topbar"><button class="back" data-go="'+(back||'')+'" aria-label="戻る">←</button><div class="ttl">'+title+'</div>'+(extra||'')+'</div>'}
+/* 上部バー：左に戻る（丸ボタン）、右端に音のオン・オフ（アイコンとクリックは audio.js が担当） */
+function topbar(title,extra,back){return '<div class="topbar"><button class="ibtn back" data-go="'+(back||'')+'" aria-label="戻る">←</button><div class="ttl">'+title+'</div>'+(extra||'')+
+  '<button class="ibtn mute" data-mute data-sfx="none" aria-label="音のオン・オフ"></button></div>'}
 function bind(root){root.querySelectorAll('[data-go]').forEach(b=>b.addEventListener('click',()=>go(b.dataset.go)))}
 
 /* ---------- キャラクター ---------- */
