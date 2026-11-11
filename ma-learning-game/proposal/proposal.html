@@ -1,0 +1,296 @@
+<title>Deal Tamers 企画提案</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Dela+Gothic+One&family=Zen+Kaku+Gothic+New:wght@400;500;700&family=IBM+Plex+Mono:wght@500&display=swap">
+<style>
+/* Layout: 縦スクロールの1枚資料。各セクションは「見出し＋図」。ヒーローは夜明けの街並み（買収企業＝建物）。 */
+:root{
+  --bg:#f3f5f1;          /* 薄い草色がかった紙 */
+  --surface:#ffffff;
+  --ink:#16251f;         /* 深い森の緑黒 */
+  --muted:#5b6b64;
+  --line:#d5ddd7;
+  --accent:#e2851b;      /* 取引成立の琥珀 */
+  --accent-soft:#fbe8d0;
+  --leaf:#2f7d5b;        /* 成長・統合 */
+  --leaf-soft:#dcefe5;
+  --sky1:#203a4f; --sky2:#e9a65b;
+  --font-display:"Dela Gothic One","Hiragino Sans","Noto Sans JP",sans-serif;
+  --font-body:"Zen Kaku Gothic New","Hiragino Sans","Noto Sans JP",system-ui,sans-serif;
+  --font-data:"IBM Plex Mono",ui-monospace,monospace;
+  --fs-xs:.78rem; --fs-s:.9rem; --fs-m:1rem; --fs-l:1.25rem; --fs-xl:1.75rem; --fs-xxl:clamp(2.2rem,6vw,3.6rem);
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#0f1714; --surface:#17221d; --ink:#e8efe9; --muted:#9fb0a7; --line:#2a3832;
+  --accent:#f0a14a; --accent-soft:#3a2a16; --leaf:#5fc192; --leaf-soft:#173528;
+  --sky1:#0b1621; --sky2:#8a5a2e; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#0f1714; --surface:#17221d; --ink:#e8efe9; --muted:#9fb0a7; --line:#2a3832;
+  --accent:#f0a14a; --accent-soft:#3a2a16; --leaf:#5fc192; --leaf-soft:#173528;
+  --sky1:#0b1621; --sky2:#8a5a2e; color-scheme:dark}
+
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font-family:var(--font-body);font-size:var(--fs-m);line-height:1.75;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:0 72px}
+.wrap{max-width:980px;margin:0 auto;display:flex;flex-direction:column;gap:72px}
+h1,h2,h3{text-wrap:balance;margin:0;font-weight:400}
+h2{font-family:var(--font-display);font-size:var(--fs-xl);line-height:1.3}
+h3{font-weight:700;font-size:var(--fs-m)}
+p{margin:0}
+.eyebrow{font-family:var(--font-data);font-size:var(--fs-xs);letter-spacing:.14em;text-transform:uppercase;color:var(--accent)}
+.sec{display:flex;flex-direction:column;gap:24px}
+.sec-head{display:flex;flex-direction:column;gap:6px}
+.lead{color:var(--muted);max-width:40em}
+
+/* Hero */
+.hero{margin-inline:calc(-1 * max(16px,env(safe-area-inset-left,0px)));border-radius:0 0 28px 28px;overflow:hidden;
+  background:linear-gradient(180deg,var(--sky1) 0%,var(--sky1) 35%,var(--sky2) 100%);color:#fff;position:relative}
+.hero-in{max-width:980px;margin:0 auto;padding:56px max(16px,env(safe-area-inset-left,0px)) 0;display:flex;flex-direction:column;gap:18px;position:relative;z-index:1}
+.hero .eyebrow{color:#ffd29a}
+.hero h1{font-family:var(--font-display);font-size:var(--fs-xxl);line-height:1.15;letter-spacing:.01em}
+.hero h1 small{display:block;font-family:var(--font-body);font-weight:500;font-size:var(--fs-s);opacity:.8;margin-top:6px;letter-spacing:.08em}
+.hero p.tag{font-size:var(--fs-l);font-weight:500;max-width:28em;line-height:1.6}
+.hero svg{display:block;width:100%;height:auto;margin-top:8px}
+
+/* Decisions */
+.decisions{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:12px}
+.dec{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:18px;display:flex;flex-direction:column;gap:8px;min-width:0}
+.dec .k{font-size:var(--fs-xs);color:var(--muted);letter-spacing:.06em}
+.dec .v{font-weight:700;font-size:var(--fs-m);line-height:1.5}
+.dec .adr{margin-top:auto;font-family:var(--font-data);font-size:.7rem;color:var(--leaf);background:var(--leaf-soft);align-self:flex-start;padding:2px 8px;border-radius:99px}
+.dec.main{grid-column:1/-1;background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.dec.main .k{color:var(--bg);opacity:.7}
+.dec.main .v{font-family:var(--font-display);font-weight:400;font-size:var(--fs-l)}
+.dec.main .adr{background:var(--accent);color:#1b1206}
+
+/* Why */
+.why{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:20px}
+.why div{display:flex;flex-direction:column;gap:6px;border-top:3px solid var(--ink);padding-top:14px;min-width:0}
+.why div:nth-child(2){border-color:var(--accent)}
+.why div:nth-child(3){border-color:var(--leaf)}
+.why p{color:var(--muted);font-size:var(--fs-s)}
+
+/* Loop */
+.loop{display:grid;grid-template-columns:repeat(7,1fr);gap:8px;counter-reset:s}
+.step{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:14px 10px;display:flex;flex-direction:column;gap:6px;min-width:0;position:relative}
+.step .n{font-family:var(--font-data);font-size:var(--fs-xs);color:var(--accent)}
+.step .t{font-weight:700;font-size:var(--fs-s);line-height:1.4}
+.step .g{font-size:var(--fs-xs);color:var(--muted);line-height:1.5}
+.step.hl{background:var(--accent-soft);border-color:transparent}
+.loop-note{display:flex;align-items:center;gap:10px;font-size:var(--fs-s);color:var(--muted)}
+.loop-note b{color:var(--leaf)}
+@media (max-width:760px){.loop{grid-template-columns:1fr 1fr}.step:last-child{grid-column:1/-1}}
+
+/* Beast */
+.beast{display:grid;grid-template-columns:minmax(0,300px) minmax(0,1fr);gap:28px;align-items:center}
+.beast-card{background:var(--surface);border:1px solid var(--line);border-radius:20px;padding:20px;display:flex;flex-direction:column;gap:12px}
+.beast-card svg{width:100%;height:auto}
+.beast-card .name{font-family:var(--font-display);font-size:var(--fs-l)}
+.beast-card .sub{font-size:var(--fs-xs);color:var(--muted)}
+.map{display:grid;grid-template-columns:1fr 1fr;gap:0;border-top:1px solid var(--line)}
+.map div{padding:10px 4px;border-bottom:1px solid var(--line);font-size:var(--fs-s);min-width:0}
+.map div:nth-child(odd){font-weight:700}
+.map div:nth-child(even){color:var(--muted)}
+.map .hid{color:var(--accent)}
+@media (max-width:640px){.beast{grid-template-columns:1fr}}
+
+/* City */
+.layers{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+.layer{border-radius:14px;padding:18px;display:flex;flex-direction:column;gap:6px;min-width:0}
+.layer:nth-child(1){background:var(--surface);border:1px solid var(--line)}
+.layer:nth-child(2){background:var(--accent-soft)}
+.layer:nth-child(3){background:var(--leaf-soft)}
+.layer .time{font-family:var(--font-data);font-size:var(--fs-xs);color:var(--muted)}
+.layer p{font-size:var(--fs-s)}
+@media (max-width:640px){.layers{grid-template-columns:1fr}}
+
+/* Roadmap */
+.road{overflow-x:auto}
+.road table{border-collapse:collapse;width:100%;min-width:620px;font-size:var(--fs-s)}
+.road th,.road td{text-align:left;padding:10px 12px;border-bottom:1px solid var(--line);vertical-align:top}
+.road th{font-size:var(--fs-xs);color:var(--muted);font-weight:500;letter-spacing:.06em}
+.road td:first-child{font-family:var(--font-data);color:var(--accent);white-space:nowrap}
+.road td:nth-child(2){font-weight:700;white-space:nowrap}
+.bar{display:inline-block;height:6px;border-radius:3px;background:var(--leaf);vertical-align:middle}
+
+/* Next */
+.next{display:grid;grid-template-columns:minmax(0,1.3fr) minmax(0,1fr);gap:20px}
+.phases{display:flex;flex-direction:column;gap:10px}
+.ph{display:flex;gap:14px;align-items:flex-start;padding:14px 16px;border-radius:12px;background:var(--surface);border:1px solid var(--line)}
+.ph .tag{font-family:var(--font-data);font-size:var(--fs-xs);padding:2px 8px;border-radius:99px;white-space:nowrap;background:var(--line);color:var(--ink)}
+.ph.now{border-color:var(--accent);box-shadow:0 0 0 1px var(--accent) inset}
+.ph.now .tag{background:var(--accent);color:#1b1206}
+.ph.done .tag{background:var(--leaf);color:#fff}
+.ph p{font-size:var(--fs-s);color:var(--muted)}
+.open{background:var(--ink);color:var(--bg);border-radius:16px;padding:20px;display:flex;flex-direction:column;gap:12px}
+.open h3{font-family:var(--font-display);font-weight:400;font-size:var(--fs-l)}
+.open ul{margin:0;padding-left:1.1em;display:flex;flex-direction:column;gap:6px;font-size:var(--fs-s)}
+@media (max-width:640px){.next{grid-template-columns:1fr}}
+@media (prefers-reduced-motion:no-preference){
+  .win{animation:blink 4s ease-in-out infinite}
+  .win:nth-of-type(3n){animation-delay:1.3s}.win:nth-of-type(4n){animation-delay:2.4s}
+  @keyframes blink{0%,100%{opacity:1}50%{opacity:.55}}
+}
+</style>
+
+<section class="hero">
+  <div class="hero-in">
+    <span class="eyebrow">企画提案 · M&amp;A学習ゲーム</span>
+    <h1>Deal Tamers<small>ディール・テイマーズ（仮称）</small></h1>
+    <p class="tag">会社という“生き物”を見極め、迎え入れ、育てる。<br>遊ぶうちにM&amp;Aがわかる、街づくり経営シム。</p>
+  </div>
+  <svg viewBox="0 0 980 230" preserveAspectRatio="xMidYMax slice" aria-hidden="true">
+    <circle cx="790" cy="120" r="52" fill="#ffd29a" opacity=".85"/>
+    <g fill="#15241d">
+      <rect x="0" y="170" width="980" height="60"/>
+      <rect x="40" y="120" width="70" height="60" rx="4"/>
+      <rect x="130" y="80" width="56" height="100" rx="4"/>
+      <rect x="205" y="140" width="90" height="40" rx="4"/>
+      <rect x="420" y="40" width="96" height="140" rx="6"/>
+      <polygon points="420,40 468,10 516,40"/>
+      <rect x="540" y="105" width="64" height="75" rx="4"/>
+      <rect x="625" y="130" width="110" height="50" rx="4"/>
+      <rect x="850" y="95" width="74" height="85" rx="4"/>
+    </g>
+    <g fill="#ffd29a">
+      <rect class="win" x="140" y="92" width="10" height="10"/><rect class="win" x="164" y="92" width="10" height="10"/>
+      <rect class="win" x="140" y="116" width="10" height="10"/><rect class="win" x="164" y="140" width="10" height="10"/>
+      <rect class="win" x="436" y="60" width="14" height="14"/><rect class="win" x="462" y="60" width="14" height="14"/>
+      <rect class="win" x="488" y="60" width="14" height="14"/><rect class="win" x="436" y="90" width="14" height="14"/>
+      <rect class="win" x="488" y="90" width="14" height="14"/><rect class="win" x="462" y="120" width="14" height="14"/>
+      <rect class="win" x="552" y="118" width="10" height="10"/><rect class="win" x="580" y="140" width="10" height="10"/>
+      <rect class="win" x="864" y="110" width="10" height="10"/><rect class="win" x="896" y="132" width="10" height="10"/>
+    </g>
+    <text x="468" y="170" text-anchor="middle" font-family="IBM Plex Mono,monospace" font-size="11" fill="#ffd29a">HQ</text>
+    <!-- 企業獣たち -->
+    <g transform="translate(318,128)">
+      <ellipse cx="30" cy="34" rx="30" ry="22" fill="#e2851b"/>
+      <polygon points="12,16 18,0 26,14" fill="#e2851b"/><polygon points="34,14 42,0 48,16" fill="#e2851b"/>
+      <circle cx="22" cy="30" r="5" fill="#fff"/><circle cx="40" cy="30" r="5" fill="#fff"/>
+      <circle cx="23" cy="31" r="2.4" fill="#15241d"/><circle cx="41" cy="31" r="2.4" fill="#15241d"/>
+    </g>
+    <g transform="translate(748,140)">
+      <ellipse cx="22" cy="24" rx="22" ry="16" fill="#5fc192"/>
+      <rect x="10" y="2" width="5" height="12" rx="2" fill="#5fc192"/><rect x="29" y="2" width="5" height="12" rx="2" fill="#5fc192"/>
+      <circle cx="16" cy="22" r="4" fill="#fff"/><circle cx="29" cy="22" r="4" fill="#fff"/>
+      <circle cx="17" cy="23" r="2" fill="#15241d"/><circle cx="30" cy="23" r="2" fill="#15241d"/>
+    </g>
+  </svg>
+</section>
+
+<div class="wrap">
+
+  <section class="sec">
+    <div class="sec-head"><span class="eyebrow">決定事項</span><h2>ここまでに決まったこと</h2></div>
+    <div class="decisions">
+      <div class="dec main"><span class="k">ゲームの方向性</span><span class="v">経営シムの骨格 × 企業擬人化モンスター育成 × 街の発展</span><span class="adr">ADR-0001</span></div>
+      <div class="dec"><span class="k">ターゲット</span><span class="v">20〜50代のシミュレーション・街づくりゲーム好き</span><span class="adr">ADR-0002</span></div>
+      <div class="dec"><span class="k">プラットフォーム</span><span class="v">iOS / Android ネイティブアプリ</span><span class="adr">ADR-0002</span></div>
+      <div class="dec"><span class="k">モックアップ</span><span class="v">ブラウザで動くHTMLプロトタイプ</span><span class="adr">ADR-0002</span></div>
+      <div class="dec"><span class="k">開発体制</span><span class="v">Claude Code ＋ 情報管理規則で運用</span><span class="adr">CLAUDE.md</span></div>
+    </div>
+  </section>
+
+  <section class="sec">
+    <div class="sec-head"><span class="eyebrow">狙い</span><h2>勉強ではなく、遊びの延長でM&amp;Aがわかる</h2></div>
+    <div class="why">
+      <div><h3>入口は「遊びたい人」</h3><p>M&amp;Aの予備知識は前提にしない。街づくり・育成の気持ちよさで続けてもらう。</p></div>
+      <div><h3>判断の手触りを残す</h3><p>探す・値付けする・調べる・契約する・統合する。一連の判断を自分で下し、結果まで見届ける。</p></div>
+      <div><h3>数字と人がつながる</h3><p>高く買えば減損、統合を怠れば人が離れる。財務とPMIの因果を体験で覚える。</p></div>
+    </div>
+  </section>
+
+  <section class="sec">
+    <div class="sec-head"><span class="eyebrow">コアループ · 1案件 10〜15分</span><h2>1つの案件を、最初から最後まで</h2></div>
+    <div class="loop">
+      <div class="step"><span class="n">01</span><span class="t">探索</span><span class="g">戦略に合う企業獣を見つける</span></div>
+      <div class="step"><span class="n">02</span><span class="t">鑑定</span><span class="g">3つのレンズで価値を算定</span></div>
+      <div class="step"><span class="n">03</span><span class="t">交渉</span><span class="g">売り手の本当の動機を読む</span></div>
+      <div class="step hl"><span class="n">04</span><span class="t">DD</span><span class="g">限られた予算で隠しステータスを暴く</span></div>
+      <div class="step"><span class="n">05</span><span class="t">契約</span><span class="g">条項カードでリスクに備える</span></div>
+      <div class="step hl"><span class="n">06</span><span class="t">統合</span><span class="g">100日プランでなつき度を育てる</span></div>
+      <div class="step"><span class="n">07</span><span class="t">振り返り</span><span class="g">判断と結果の因果を確認</span></div>
+    </div>
+    <p class="loop-note">成果は <b>街の発展</b> に反映され、次の案件へ。</p>
+  </section>
+
+  <section class="sec">
+    <div class="sec-head"><span class="eyebrow">企業獣（カンパニー・ビースト）</span><h2>決算書は、ステータスになる</h2><p class="lead">擬人化は入口。いつでも“本当の数字”である財務三表に切り替えて見られる。</p></div>
+    <div class="beast">
+      <div class="beast-card">
+        <svg viewBox="0 0 260 170" aria-label="企業獣のイメージ">
+          <ellipse cx="130" cy="150" rx="80" ry="10" fill="var(--line)"/>
+          <ellipse cx="130" cy="98" rx="78" ry="54" fill="var(--accent)"/>
+          <polygon points="82,60 92,18 112,54" fill="var(--accent)"/><polygon points="148,54 168,18 178,60" fill="var(--accent)"/>
+          <path d="M70 120 q60 26 120 0" fill="none" stroke="var(--ink)" stroke-width="3" stroke-dasharray="6 6" opacity=".5"/>
+          <circle cx="108" cy="90" r="13" fill="#fff"/><circle cx="152" cy="90" r="13" fill="#fff"/>
+          <circle cx="110" cy="92" r="6" fill="#15241d"/><circle cx="154" cy="92" r="6" fill="#15241d"/>
+          <path d="M118 116 q12 10 24 0" fill="none" stroke="#15241d" stroke-width="3" stroke-linecap="round"/>
+          <rect x="196" y="40" width="34" height="34" rx="9" fill="var(--surface)" stroke="var(--accent)" stroke-width="2"/>
+          <text x="213" y="64" text-anchor="middle" font-family="Dela Gothic One,sans-serif" font-size="20" fill="var(--accent)">?</text>
+        </svg>
+        <div><div class="name">マチコウバ</div><div class="sub">製造業 · 後継者不在の町工場 · 序章〜1章</div></div>
+      </div>
+      <div class="map">
+        <div>体格</div><div>売上高</div>
+        <div>攻撃力</div><div>営業利益・利益率</div>
+        <div>守備力</div><div>純資産・自己資本比率</div>
+        <div>重り</div><div>有利子負債</div>
+        <div>特性スキル</div><div>技術・ブランド・顧客基盤（シナジー源）</div>
+        <div class="hid">隠しステータス ?</div><div>簿外債務・訴訟・キーマン依存（DDで判明）</div>
+        <div>なつき度</div><div>従業員エンゲージメント（PMI）</div>
+      </div>
+    </div>
+  </section>
+
+  <section class="sec">
+    <div class="sec-head"><span class="eyebrow">3層の体験</span><h2>買った会社が、街になる</h2><p class="lead">迎え入れた企業獣は街の建物として加わる。相性の良い会社を隣に置けばシナジーが伸び、統合が成功すると建物がグレードアップする。</p></div>
+    <div class="layers">
+      <div class="layer"><span class="time">30秒〜2分</span><h3>マイクロ：1つの判断</h3><p>DDでどこを調べるか、どの条項を入れるか。</p></div>
+      <div class="layer"><span class="time">10〜15分</span><h3>コア：1つの案件</h3><p>探索から振り返りまでの7ステップ。</p></div>
+      <div class="layer"><span class="time">数日〜数週間</span><h3>メタ：街の発展</h3><p>街の拡大、章の進行、ランク昇格、図鑑収集。</p></div>
+    </div>
+  </section>
+
+  <section class="sec">
+    <div class="sec-head"><span class="eyebrow">学習ロードマップ</span><h2>章ごとに、学ぶことは1〜3個だけ</h2></div>
+    <div class="road">
+      <table>
+        <thead><tr><th>章</th><th>テーマ</th><th>学ぶこと</th><th>難易度</th></tr></thead>
+        <tbody>
+          <tr><td>序章</td><td>小さなパン屋の事業承継</td><td>M&amp;Aとは、株式譲渡、全体の流れ</td><td><span class="bar" style="width:14%"></span></td></tr>
+          <tr><td>1章</td><td>後継者のいない町工場</td><td>純資産法、財務DD、表明保証</td><td><span class="bar" style="width:26%"></span></td></tr>
+          <tr><td>2章</td><td>成長のための買収</td><td>類似会社比較、シナジー、PMIの基礎</td><td><span class="bar" style="width:38%"></span></td></tr>
+          <tr><td>3章</td><td>競争入札</td><td>DCF、入札プロセス、勝者の呪い</td><td><span class="bar" style="width:50%"></span></td></tr>
+          <tr><td>4章</td><td>失敗から学ぶ</td><td>のれん・減損、統合失敗の典型</td><td><span class="bar" style="width:60%"></span></td></tr>
+          <tr><td>5章</td><td>スキームを選ぶ</td><td>事業譲渡・会社分割・株式交換</td><td><span class="bar" style="width:72%"></span></td></tr>
+          <tr><td>6章</td><td>大型案件</td><td>LBO、TOB、MBO</td><td><span class="bar" style="width:84%"></span></td></tr>
+          <tr><td>7章</td><td>敵対的買収と防衛</td><td>ホワイトナイト、買収防衛策</td><td><span class="bar" style="width:96%"></span></td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section class="sec">
+    <div class="sec-head"><span class="eyebrow">次のステップ</span><h2>次はモックアップへ</h2></div>
+    <div class="next">
+      <div class="phases">
+        <div class="ph done"><span class="tag">完了</span><div><h3>Phase 0　コンセプト・UX基礎設計</h3><p>方向性・ターゲット・プラットフォームを決定</p></div></div>
+        <div class="ph now"><span class="tag">次</span><div><h3>Phase 1　ブラウザモックアップ</h3><p>ホーム（街）・企業ステータス・DD・PMIの4画面から着手</p></div></div>
+        <div class="ph"><span class="tag">その後</span><div><h3>Phase 2　検証</h3><p>ユーザーテスト、M&amp;A実務家による監修</p></div></div>
+      </div>
+      <div class="open">
+        <h3>これから決めること</h3>
+        <ul>
+          <li>企業獣のアートのトーン</li>
+          <li>収益モデル（買い切り／基本無料／法人ライセンス）</li>
+          <li>M&amp;A監修者の確保</li>
+          <li>正式タイトル（商標調査）</li>
+          <li>ネイティブアプリの実装技術</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+</div>

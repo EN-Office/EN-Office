@@ -1,0 +1,19 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "チュートリアルを開く（Chrome）",
+      "type": "chrome",
+      "request": "launch",
+      "url": "http://localhost:5173",
+      "preLaunchTask": "チュートリアルを起動"
+    },
+    {
+      "name": "チュートリアルを開く（Edge）",
+      "type": "msedge",
+      "request": "launch",
+      "url": "http://localhost:5173",
+      "preLaunchTask": "チュートリアルを起動"
+    }
+  ]
+}
