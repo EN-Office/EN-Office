@@ -4,8 +4,8 @@ M&A（企業の合併・買収）の取引プロセスを、ゲームを通じ�
 Claude Code で作業する場合は、まず [CLAUDE.md](CLAUDE.md) を読んでください。
 
 ## 現在のフェーズ
-- **Phase 0：コンセプト・UX基礎設計**（現在）
-- Phase 1：モックアップ制作
+- Phase 0：コンセプト・UX基礎設計
+- **Phase 1：モックアップ制作**（現在）
 - Phase 2：検証（ユーザーテスト・監修）
 
 ## ドキュメント索引
@@ -22,5 +22,7 @@ Claude Code で作業する場合は、まず [CLAUDE.md](CLAUDE.md) を読ん�
 | [意思決定ログ](decisions/DECISION_LOG.md) | ADR一覧 | — |
 | [未決事項](OPEN_QUESTIONS.md) | 確認待ちの論点 | — |
 | [社内提案書](proposal/proposal.html) | 決定事項をまとめたHTML提案資料（Artifactとして公開） | — |
+| [UIガイドライン](docs/03_spec/ui-guidelines.md) | 押せる要素の区別、文字量、用語モーダル、サウンド、3Dの規則 | draft |
 | [チュートリアル体験モックアップ](mockup/index.html) | 9:16縦画面のブラウザモックアップ | draft |
+| [3Dモデルの生成](tools/blender/build_models.py) | BlenderでGLBモデルを生成するスクリプト | — |
 | [ローカル起動手順](app/README.md) | VS Codeでチュートリアルを起動（F5 / npm start） | — |

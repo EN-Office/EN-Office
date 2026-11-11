@@ -18,6 +18,6 @@
 ブラウザの開発者ツール（F12）→ デバイスツールバー（Ctrl+Shift+M）で、iPhone などの端末を選ぶと 9:16 の画面で確認できます。
 
 ## 編集するとき
-- 画面の中身は `mockup/index.html` の1ファイルです。保存してブラウザを再読み込みすると反映されます。
+- 画面の中身は `mockup/` フォルダです（`index.html`、`css/`、`js/`、`assets/`）。保存してブラウザを再読み込みすると反映されます。
 - ポート番号を変える場合：`PORT=3000 npm start`（Windows PowerShell は `$env:PORT=3000; npm start`）。
 - フォントは Google Fonts から読み込むため、オフラインでは代わりのフォントで表示されます。

@@ -40,7 +40,9 @@ ma-learning-game/
 │   ├── 99_archive/           # 廃止したドキュメントの保管場所
 │   └── glossary.md           # 用語集（唯一の正）
 ├── notes/                    # 議事メモ・調査メモ（下書き。正式情報ではない）
-└── mockup/                   # モックアップ（Phase 1で作成）
+├── mockup/                   # モックアップ（index.html / css / js / assets / vendor）
+├── tools/blender/            # 3Dモデル（GLB）を生成するBlenderスクリプト
+└── app/                      # ローカル起動用の簡易サーバー
 ```
 
 ## 4. 作業ルール（必須）
@@ -87,4 +89,5 @@ ma-learning-game/
 - ゲームの方向性は「経営シミュレーションの骨格 × 企業擬人化モンスター育成の表現」のハイブリッドに**決定**（ADR-0001, accepted, 2026-11-03）。
 - ターゲットは20〜50代のシミュレーション・街づくりゲーム好き、プラットフォームは iOS / Android ネイティブアプリ、モックアップはブラウザで動くHTMLで作る（ADR-0002, accepted, 2026-11-04）。
 - リポジトリは当面この公開リポジトリで継続する。機密情報は書かない。
-- コードはまだ存在しない。ビルド・テストコマンドは Phase 1 で技術選定後にここへ追記する。
+- モックアップのUIは `docs/03_spec/ui-guidelines.md` に従う（ADR-0003, proposed, 2026-11-11）。
+- モックアップの起動は `npm start`（http://localhost:5173）。ビルドは不要。3Dモデルの再生成は `python3 tools/blender/build_models.py`。
