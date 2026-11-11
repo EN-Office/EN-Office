@@ -1,0 +1,111 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>3Dモデル確認</title>
+<style>
+:root{--night:#0e1a17;--dusk:#1d3a46;--ember:#f0a14a;--paper:#f6efe2;--mist:#bfcec6;--ink:#16251f}
+*{box-sizing:border-box}
+body{margin:0;background:linear-gradient(180deg,#1d3a46 0%,#3b3a4a 55%,#5a3e36 100%);color:var(--paper);
+  font-family:"Zen Kaku Gothic New","Hiragino Sans","Noto Sans JP",system-ui,sans-serif;padding:16px 16px 48px}
+h1{font-size:20px;margin:4px 0 2px}
+h2{font-size:15px;margin:22px 0 8px;color:var(--ember);letter-spacing:.04em}
+p.note{margin:0 0 8px;color:var(--mist);font-size:12px}
+#status{font-family:"IBM Plex Mono",ui-monospace,monospace;font-size:12px;color:var(--mist)}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px}
+.card{background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12);border-radius:14px;overflow:hidden}
+.card .v{height:170px;position:relative;background:radial-gradient(ellipse at 50% 85%,rgba(255,214,160,.22),transparent 65%)}
+.card .n{font-family:"IBM Plex Mono",ui-monospace,monospace;font-size:11px;padding:6px 8px;color:var(--mist);display:flex;justify-content:space-between}
+.wide{grid-column:1/-1}.wide .v{height:220px}
+.hosts{display:flex;gap:10px;flex-wrap:wrap}
+.host{width:120px;height:120px;border-radius:14px;background:rgba(255,255,255,.06)}
+.host svg{width:100%;height:100%;display:block}
+button.host{border:1px solid rgba(255,255,255,.2);color:inherit;padding:0;cursor:pointer}
+.cmp{display:flex;gap:6px;align-items:center}
+.cmp .s{width:72px;height:72px}
+</style>
+</head>
+<body>
+<h1>Deal Tamers — 3Dモデル確認</h1>
+<p class="note">tools/blender/build_models.py が生成したGLB（assets/models.js 埋め込み）を Kit3D で表示。共有WebGLレンダラー1つで全ビューを描画。</p>
+<div id="status">…</div>
+
+<h2>企業獣（表情：smile / worry / o）</h2>
+<div class="grid" id="moods"></div>
+
+<h2>建物（レベル1〜5を積み上げ）</h2>
+<div class="grid" id="levels"></div>
+
+<h2>全モデル（ターンテーブル）</h2>
+<div class="grid" id="all"></div>
+
+<h2>data-beast3d（Kit3D.scan）— 左：SVG（フォールバック）、右：3D</h2>
+<p class="note">タップで跳ねる。1つ目は data-spin="drag"、2つ目は data-mood="worry"、3つ目は &lt;button&gt; の中（クリックはボタンへ通す）。</p>
+<div class="hosts" id="hosts"></div>
+
+<script src="../vendor/three.bundle.js"></script>
+<script src="../assets/models.js"></script>
+<script src="../js/kit3d.js"></script>
+<script src="../js/audio.js"></script>
+<script src="../js/core.js"></script>
+<script>
+'use strict';
+const $=s=>document.querySelector(s);
+const names=Object.keys(typeof MODELS_B64!=='undefined'?MODELS_B64:{});
+const kb=n=>(MODELS_B64[n].length*3/4/1024).toFixed(0)+'KB';
+$('#status').textContent='Kit3D.ready='+Kit3D.ready+' / models='+names.length+' / reduced-motion='+matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+function card(parent,label,meta,wide){
+  const c=document.createElement('div');c.className='card'+(wide?' wide':'');
+  c.innerHTML='<div class="v"></div><div class="n"><span>'+label+'</span><span>'+(meta||'')+'</span></div>';
+  parent.appendChild(c);return c.querySelector('.v');
+}
+function stage(host,objs,opt){
+  opt=opt||{};
+  const scene=new THREE.Scene();Kit3D.addLights(scene);
+  const cam=new THREE.PerspectiveCamera(opt.fov||28,1,.1,50);
+  const tgt=opt.target||new THREE.Vector3(0,.5,0);
+  cam.position.copy(opt.cam||new THREE.Vector3(0,.95,2.9));cam.lookAt(tgt);
+  const turn=new THREE.Group();scene.add(turn);
+  objs.forEach(o=>{turn.add(o);if(!opt.noShadow){const s=Kit3D.shadow(opt.shadow||.5);s.position.x=o.position.x;s.position.z=o.position.z;turn.add(s)}});
+  Kit3D.view(host,{scene,camera:cam,tick:(dt,t)=>{if(opt.spin!==false)turn.rotation.y=opt.osc?Math.sin(t*.6)*opt.osc+(opt.yaw||0):t*.5+(opt.yaw||0)}});
+  if(opt.yaw)turn.rotation.y=opt.yaw;
+}
+if(Kit3D.ready){
+  const beasts=['machi','hayate','misemori','pan','it','seed','oyaji'];
+  beasts.forEach(k=>{
+    const v=card($('#moods'),'beast_'+k,'smile · worry · o',true);
+    Promise.all(['smile','worry','o'].map(m=>Kit3D.load('beast_'+k).then(o=>{Kit3D.setMood(o,m);return o}))).then(os=>{
+      os.forEach((o,i)=>o.position.x=(i-1)*1.05);
+      stage(v,os,{cam:new THREE.Vector3(0,1.0,4.2),target:new THREE.Vector3(0,.48,0),spin:true,osc:.45,fov:30});
+    });
+  });
+  ['pan','hayate','it','machi'].forEach(k=>{
+    const v=card($('#levels'),'bld_'+k,'Lv1 → Lv5',true);
+    Kit3D.load('bld_'+k).then(b=>{
+      const os=[1,2,3,4,5].map(l=>{const g=Kit3D.stackBuilding(b,l);g.position.x=(l-3)*1.3;g.rotation.y=-.55;return g});
+      stage(v,os,{cam:new THREE.Vector3(0,2.3,7.4),target:new THREE.Vector3(0,.9,0),spin:false,fov:30,shadow:.75});
+    });
+  });
+  names.forEach(n=>{
+    const v=card($('#all'),n,kb(n));
+    Kit3D.load(n).then(o=>{
+      const isB=n.startsWith('bld_');
+      stage(v,[o],{cam:isB?new THREE.Vector3(1.6,1.75,2.6):new THREE.Vector3(0,.95,2.9),target:new THREE.Vector3(0,isB?.6:.47,0),shadow:isB?.75:.5,yaw:-.5});
+    });
+  });
+}
+['machi','misemori','seed','owl','pan'].forEach((k,i)=>{
+  const wrap=document.createElement('div');wrap.className='cmp';
+  const svg=k==='owl'?minato():beast(Object.assign({},B[k],{mood:i===1?'worry':'smile'}));
+  const s=document.createElement('div');s.className='host s';s.innerHTML=svg;wrap.appendChild(s);
+  const h=document.createElement(i===2?'button':'div');h.className='host';h.dataset.beast3d=k;
+  if(i===0)h.dataset.spin='drag';if(i===1)h.dataset.mood='worry';if(i===4)h.dataset.spin='none';
+  if(i===2)h.addEventListener('click',()=>{h.style.outline='3px solid var(--ember)';setTimeout(()=>h.style.outline='',300)});
+  h.innerHTML=svg;wrap.appendChild(h);
+  $('#hosts').appendChild(wrap);
+});
+</script>
+</body>
+</html>
