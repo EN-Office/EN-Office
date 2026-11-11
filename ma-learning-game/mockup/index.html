@@ -386,7 +386,7 @@ function skyline(opts){
 /* ---------- 目次 ---------- */
 S.index=function(){
   const main=[['opening','🌅','はじまり','#ffd29a'],['town','🏙','経営','#5fc192'],['deal','🤝','M&A','#f0a14a'],['merit','🎉','成果','#8fb5ff']];
-  const sub=[['minigame','🔍','DDスキャン','#2f5e6e'],['breaker','🧱','ブロック','#b48cff'],['shop','🛒','ショップ','#ef6b5b']];
+  const sub=[['minigame','🔍','DDスキャン','#2f5e6e'],['shop','🛒','ショップ','#ef6b5b']];
   const card=(it,i,n)=>'<button class="fade" style="animation-delay:'+(i*50)+'ms" data-go="'+it[0]+'">'+(n?'<span class="no">'+n+'</span>':'')+'<span class="ci" style="background:'+it[3]+'">'+it[1]+'</span><b>'+it[2]+'</b></button>';
   const el=mount(
     '<div class="idx-hero">'+skyline({beasts:true})+'<div class="logo fade"><small>チュートリアル · モックアップ</small>Deal<br>Tamers</div></div>'+
@@ -394,7 +394,7 @@ S.index=function(){
     '<button class="btn" id="startall">▶ はじめから遊ぶ</button>'+
     '<div class="flowline"><span>🏢</span><i>›</i><span>🏙</span><i>›</i><span>🤝</span><i>›</i><span>🎉</span><i>›</i><span>🎮</span></div>'+
     '<p class="label">チャプター</p><div class="chap" style="grid-template-columns:repeat(4,1fr)">'+main.map((it,i)=>card(it,i,i+1)).join('')+'</div>'+
-    '<p class="label">ミニゲーム・ショップ</p><div class="chap">'+sub.map((it,i)=>card(it,i+4)).join('')+'</div>'+
+    '<p class="label">ミニゲーム・ショップ</p><div class="chap" style="grid-template-columns:repeat(2,1fr)">'+sub.map((it,i)=>card(it,i+4)).join('')+'</div>'+
     '</div>');
   bind(el);
   el.querySelector('#startall').addEventListener('click',()=>{G=null;try{sessionStorage.removeItem('dt-g')}catch(e){}go('opening')});
@@ -478,8 +478,7 @@ S.minigame=function(){
     bind(el);el.querySelector('#start').addEventListener('click',()=>play(Math.floor(Math.random()*PUZ.length)));
   }
   function play(pi){
-    let bonus=0;try{bonus=sessionStorage.getItem('dt-ticket')?1:0}catch(e){}
-    st={p:PUZ[pi],pi,left:4+bonus,bonus,mode:'scan',open:{},flag:{},done:false};
+    st={p:PUZ[pi],pi,left:4,bonus:0,mode:'scan',open:{},flag:{},done:false};
     st.p.open.forEach(i=>st.open[i]=1);
     draw();
   }
@@ -503,7 +502,6 @@ S.minigame=function(){
       '<div class="body">'+
       '<div class="pcard" style="padding:.7em .8em"><p class="label" style="color:#5b6b64">📁 手がかり（事前資料）</p>'+st.p.clues.map(c=>'<p class="small" style="line-height:1.5">・'+c+'</p>').join('')+'</div>'+
       '<div class="tabs" style="margin:0"><button class="'+(st.mode==='scan'?'on':'')+'" data-m="scan">🔍 調べる（残り'+st.left+'）</button><button class="'+(st.mode==='flag'?'on':'')+'" data-m="flag">🚩 指摘する（'+marks()+'/3）</button></div>'+
-      (st.bonus?'<p class="xs" style="color:var(--leaf);text-align:center">🎟 調査チケット使用中：調べる回数 +1</p>':'')+
       '<div class="grid" id="grid">'+ROOMS.map((r,i)=>cellHTML(i)).join('')+'</div>'+
       '<p class="xs muted" style="text-align:center">数字＝上下左右の部屋にあるリスクの数</p>'+
       '</div><div class="foot"><button class="btn" id="rep" '+(marks()===3?'':'disabled')+'>報告する</button></div>','dark');
@@ -531,7 +529,6 @@ S.minigame=function(){
     const r=f===3&&scans<=3?'S':f===3?'A':f===2?'B':'C';
     const cut=[0.8,0.6,0.5].slice(0,f).reduce((a,b)=>a+b,0);
     const msg={S:'少ない調査で全てのリスクを特定！ 推理が冴えています。',A:'全てのリスクを特定できました。次は調べる回数を減らせるかも。',B:'見逃したリスクは買収後に自社が背負います。契約の表明保証で備えましょう。',C:'手がかりと数字を組み合わせて、仮説を立ててから調べてみましょう。'}[r];
-    try{sessionStorage.removeItem('dt-ticket')}catch(e){}
     const gain={S:300,A:200,B:120,C:60}[r];loadG();G.coins+=gain;saveG();
     const el=mount(topbar('結果','','town')+
       '<div class="body" style="justify-content:center;gap:1em"><p class="label" style="text-align:center">あなたの目利きランク</p><div class="rank">'+r+'</div>'+
@@ -543,118 +540,6 @@ S.minigame=function(){
       '<div class="terms" style="justify-content:center"><span>📘 デューデリジェンス</span><span>📘 簿外債務</span><span>📘 キーマン依存</span></div></div>'+
       '<div class="foot"><button class="btn" id="again">別のケースに挑戦</button><button class="btn ghost" data-go="town">🏙 街へ戻る</button></div>','dark');
     bind(el);el.querySelector('#again').addEventListener('click',()=>play((st.pi+1)%PUZ.length));
-  }
-  intro();
-};
-
-/* ---------- 2b. アクション：ブロックブレイク ---------- */
-S.breaker=function(){
-  function intro(){
-    const pat=["222222222","1*11211*1","XX1XXX1XX","121212121","1X1X*X1X1"];
-    const col=r=>['#ef6b5b','#f0a14a','#ffd29a','#5fc192','#8fb5ff'][r];
-    const el=mount(topbar('ミニゲーム','','town')+
-      '<div class="body" style="justify-content:center;text-align:center;gap:1em">'+
-      '<div style="width:70%;margin:0 auto;display:grid;grid-template-columns:repeat(9,1fr);gap:3px">'+pat.map((row,r)=>row.split('').map(ch=>'<span style="aspect-ratio:2/1;border-radius:3px;background:'+(ch==='X'?'#050707':ch==='*'?'#ffe7b0':ch==='.'?'transparent':col(r))+';'+(ch==='X'?'box-shadow:inset 0 0 0 1px #6f827a':ch==='2'?'box-shadow:inset 0 0 0 2px rgba(255,255,255,.8)':'')+'"></span>').join('')).join('')+'</div>'+
-      '<div><p class="label">ACTION GAME</p><h2 class="disp" style="font-size:2em;line-height:1.2">ブロックブレイク</h2></div>'+
-      '<div class="card small" style="text-align:left;display:flex;flex-direction:column;gap:.45em">'+
-      '<p>色のついたブロックを全部壊せばクリア。<b style="color:var(--ember)">黒いブロックは壊れない</b>。</p>'+
-      '<p>白い縁のブロックは2回当てると壊れる。</p>'+
-      '<p>金色のブロックからアイテムが落ちてくる：<br>'+'<span style="display:inline-grid;place-items:center;width:2.4em;height:1.1em;border-radius:99em;background:#8fb5ff;vertical-align:middle;margin-right:.4em"><i style="display:block;width:55%;height:.18em;background:#fff;border-radius:9em"></i></span>'+'バーが広がる　'+'<span style="display:inline-grid;place-items:center;width:2.4em;height:1.1em;border-radius:99em;background:#5fc192;vertical-align:middle;margin-right:.4em"><i style="display:block;width:1.1em;height:.3em;background:radial-gradient(circle,#fff 45%,transparent 50%) 0 0/.37em .3em repeat-x"></i></span>'+'ボールが3つに</p>'+
-      '<p class="xs muted">操作：ドラッグ／マウスでバーを動かし、タップで発射。クリア報酬あり</p></div>'+
-      '</div><div class="foot"><button class="btn" id="start">スタート</button></div>','dark');
-    bind(el);el.querySelector('#start').addEventListener('click',play);
-  }
-  function play(){
-    const el=mount(topbar('ブロックブレイク','<span class="chip" id="lv">❤❤❤</span><span class="chip ember mono" id="sc">0</span>','town')+
-      '<div style="flex:1;min-height:0;position:relative;margin:0 .6em .8em;border-radius:1em;overflow:hidden;background:linear-gradient(180deg,#24504a,#2f5d63 60%,#3b5f6b)"><canvas id="cv" style="position:absolute;inset:0;width:100%;height:100%;touch-action:none"></canvas><div id="msg" style="position:absolute;left:0;right:0;bottom:22%;text-align:center;font-weight:900;color:#ffd29a;animation:glow 1.6s infinite">タップで発射</div></div>','dark');
-    bind(el);
-    const cv=el.querySelector('#cv'),ctx=cv.getContext('2d'),dpr=Math.min(2,window.devicePixelRatio||1);
-    const box=cv.getBoundingClientRect();const W=box.width,H=box.height;cv.width=W*dpr;cv.height=H*dpr;ctx.scale(dpr,dpr);
-    const MAP=["222222222","1*11211*1","XX1XXX1XX","121212121","1X1X*X1X1","212111212","X11X.X11X"];
-    const COLS=9,ROWS=MAP.length,gap=W*.01,bw=(W-gap*(COLS+1))/COLS,bh=H*.032,top=H*.1;
-    const COL=['#ef6b5b','#f0a14a','#ffd29a','#5fc192','#8fb5ff','#b48cff','#ef6b5b'];
-    const bricks=[];let puN=0;
-    MAP.forEach((row,r)=>row.split('').forEach((ch,c)=>{
-      if(ch==='.')return;
-      const b={x:gap+c*(bw+gap),y:top+r*(bh+gap),c:COL[r],hp:1,wall:false,pu:null};
-      if(ch==='X'){b.wall=true;b.hp=1e9}
-      if(ch==='2')b.hp=2;
-      if(ch==='*'){b.pu=(puN++%2===0)?'W':'M';b.c='#ffe7b0'}
-      bricks.push(b);
-    }));
-    const total=bricks.filter(b=>!b.wall).length;
-    const pad={w:W*.24,h:H*.018,x:W/2,y:H*.92};
-    let balls=[],caps=[],lives=3,score=0,launched=false,over=false,wideT=0;
-    const R=W*.018,SPD=H*.62;
-    function newBall(){balls=[{x:pad.x,y:pad.y-R-2,vx:0,vy:0}];launched=false;el.querySelector('#msg').hidden=false}
-    newBall();
-    function launch(){if(launched||over)return;launched=true;el.querySelector('#msg').hidden=true;const a=-Math.PI/2+(Math.random()*.6-.3);balls[0].vx=SPD*Math.cos(a);balls[0].vy=SPD*Math.sin(a)}
-    function setX(clientX){const b=cv.getBoundingClientRect();pad.x=Math.max(pad.w/2,Math.min(W-pad.w/2,(clientX-b.left)/b.width*W))}
-    cv.addEventListener('pointermove',e=>setX(e.clientX));
-    cv.addEventListener('pointerdown',e=>{setX(e.clientX);launch()});
-    const keys={};const kd=e=>{if(!document.body.contains(cv))return;if(e.key==='ArrowLeft'||e.key==='ArrowRight'){keys[e.key]=e.type==='keydown';e.preventDefault()}if(e.type==='keydown'&&e.key===' '){launch();e.preventDefault()}};
-    window.addEventListener('keydown',kd);window.addEventListener('keyup',kd);
-    function hud(){el.querySelector('#lv').textContent='❤'.repeat(lives)+'♡'.repeat(3-lives);el.querySelector('#sc').textContent=score}
-    let last=performance.now();
-    function step(now){
-      if(!document.body.contains(cv)){window.removeEventListener('keydown',kd);window.removeEventListener('keyup',kd);return}
-      const dt=Math.min(.033,(now-last)/1000);last=now;
-      if(keys.ArrowLeft)pad.x=Math.max(pad.w/2,pad.x-W*1.2*dt);if(keys.ArrowRight)pad.x=Math.min(W-pad.w/2,pad.x+W*1.2*dt);
-      if(wideT>0){wideT-=dt;if(wideT<=0)pad.w=W*.24}
-      if(!launched){balls[0].x=pad.x;balls[0].y=pad.y-R-2}
-      else if(!over){
-        balls.forEach(b=>{
-          b.x+=b.vx*dt;b.y+=b.vy*dt;
-          if(b.x<R){b.x=R;b.vx=Math.abs(b.vx)}if(b.x>W-R){b.x=W-R;b.vx=-Math.abs(b.vx)}if(b.y<R){b.y=R;b.vy=Math.abs(b.vy)}
-          if(b.vy>0&&b.y+R>=pad.y-pad.h/2&&b.y+R<=pad.y+pad.h&&Math.abs(b.x-pad.x)<=pad.w/2+R){
-            const k=(b.x-pad.x)/(pad.w/2);const a=-Math.PI/2+k*1.05;const sp=Math.hypot(b.vx,b.vy);b.vx=sp*Math.cos(a);b.vy=sp*Math.sin(a);b.y=pad.y-pad.h/2-R}
-          for(const br of bricks){if(br.hp<=0)continue;
-            if(b.x+R>br.x&&b.x-R<br.x+bw&&b.y+R>br.y&&b.y-R<br.y+bh){
-              const ox=Math.min(b.x+R-br.x,br.x+bw-(b.x-R)),oy=Math.min(b.y+R-br.y,br.y+bh-(b.y-R));
-              if(ox<oy)b.vx=-b.vx;else b.vy=-b.vy;
-              if(br.wall){break}br.hp--;if(br.hp<=0){score+=100;if(br.pu)caps.push({x:br.x+bw/2,y:br.y,t:br.pu})}else score+=20;
-              hud();break}}
-        });
-        balls=balls.filter(b=>b.y-R<H);
-        caps.forEach(c=>{c.y+=H*.28*dt;if(c.y>pad.y-pad.h&&c.y<pad.y+pad.h&&Math.abs(c.x-pad.x)<pad.w/2+bw*.3){c.got=true;
-          if(c.t==='W'){pad.w=W*.38;wideT=10}else{const b0=balls[0]||{x:pad.x,y:pad.y-R,vx:0,vy:-SPD};const sp=SPD;[-.5,.5].forEach(a=>balls.push({x:b0.x,y:b0.y,vx:sp*Math.sin(a),vy:-sp*Math.cos(a)}))}
-          score+=50;hud()}});
-        caps=caps.filter(c=>!c.got&&c.y<H);
-        if(balls.length===0){lives--;hud();if(lives<=0){over=true;later(()=>end(false),600)}else newBall()}
-        if(bricks.every(b=>b.wall||b.hp<=0)){over=true;later(()=>end(true),700)}
-      }
-      // draw
-      ctx.clearRect(0,0,W,H);
-      bricks.forEach(b=>{if(b.hp<=0)return;
-        if(b.wall){ctx.fillStyle='#050707';roundRect(b.x,b.y,bw,bh,bh*.2);ctx.fill();ctx.strokeStyle='#6f827a';ctx.lineWidth=1.5;ctx.stroke();ctx.fillStyle='rgba(255,255,255,.18)';ctx.fillRect(b.x+bh*.3,b.y+bh*.2,bw-bh*.6,bh*.12);return}
-        ctx.fillStyle=b.c;roundRect(b.x,b.y,bw,bh,bh*.25);ctx.fill();
-        ctx.fillStyle='rgba(255,255,255,.28)';ctx.fillRect(b.x+bh*.25,b.y+bh*.18,bw-bh*.5,bh*.18);
-        if(b.hp>1){ctx.strokeStyle='rgba(255,255,255,.85)';ctx.lineWidth=2;roundRect(b.x+1,b.y+1,bw-2,bh-2,bh*.22);ctx.stroke()}
-        if(b.pu){ctx.save();ctx.translate(b.x+bw/2,b.y+bh/2);ctx.rotate(Math.PI/4);ctx.fillStyle='#fff';const d=bh*.32;ctx.fillRect(-d/2,-d/2,d,d);ctx.restore()}
-      });
-      caps.forEach(c=>{const cw=bw*.6,ch=bh*.85;ctx.fillStyle=c.t==='W'?'#8fb5ff':'#5fc192';roundRect(c.x-cw/2,c.y,cw,ch,ch/2);ctx.fill();ctx.fillStyle='#fff';
-        if(c.t==='W')ctx.fillRect(c.x-cw*.28,c.y+ch*.42,cw*.56,ch*.16);else[-1,0,1].forEach(k=>{ctx.beginPath();ctx.arc(c.x+k*cw*.2,c.y+ch/2,ch*.13,0,Math.PI*2);ctx.fill()})});
-      const g=ctx.createLinearGradient(0,pad.y-pad.h,0,pad.y+pad.h);g.addColorStop(0,'#ffc477');g.addColorStop(1,'#c76d14');ctx.fillStyle=g;roundRect(pad.x-pad.w/2,pad.y-pad.h/2,pad.w,pad.h,pad.h/2);ctx.fill();
-      balls.forEach(b=>{ctx.beginPath();ctx.arc(b.x,b.y,R,0,Math.PI*2);ctx.fillStyle='#ffd29a';ctx.fill();ctx.lineWidth=2;ctx.strokeStyle='#c76d14';ctx.stroke()});
-      requestAnimationFrame(step);
-    }
-    function roundRect(x,y,w,h,r){ctx.beginPath();ctx.moveTo(x+r,y);ctx.arcTo(x+w,y,x+w,y+h,r);ctx.arcTo(x+w,y+h,x,y+h,r);ctx.arcTo(x,y+h,x,y,r);ctx.arcTo(x,y,x+w,y,r);ctx.closePath()}
-    requestAnimationFrame(step);
-    function end(win){
-      const stars=win?lives:0;
-      if(win){try{sessionStorage.setItem('dt-ticket','1')}catch(e){}loadG();G.coins+=200+stars*100;saveG()}
-      const e=mount(topbar('ブロックブレイク','','town')+
-        '<div class="body" style="justify-content:center;gap:.9em;text-align:center">'+
-        (win?'<p class="disp" style="font-size:1.8em;animation:pop .6s both">STAGE CLEAR!</p><p style="font-size:1.6em;color:var(--ember);letter-spacing:.1em">'+'★'.repeat(stars)+'<span style="opacity:.3">'+'★'.repeat(3-stars)+'</span></p>'+
-          '<p class="label">クリア報酬</p>'+
-          '<div class="merit" style="text-align:left"><span class="mi" style="background:#f0a14a">🪙</span><span class="grow"><span class="mt" style="display:block">ディールコイン</span><span class="md" style="display:block">ショップや街づくりに使える</span></span><span class="mv">+'+(200+stars*100)+'</span></div>'+
-          '<div class="merit" style="text-align:left;animation-delay:.15s"><span class="mi" style="background:#5fc192">🎟</span><span class="grow"><span class="mt" style="display:block">調査チケット</span><span class="md" style="display:block">次のDDスキャンで、調べる回数 +1</span></span><span class="mv">×1</span></div>'+
-          '<div class="merit" style="text-align:left;animation-delay:.3s"><span class="mi" style="background:#8fb5ff">⛲</span><span class="grow"><span class="mt" style="display:block">街の装飾「噴水」</span><span class="md" style="display:block">ホームの街に飾れる</span></span><span class="mv">NEW</span></div>'+
-          tip('お見事！ <b>調査チケット</b>はDDスキャンで使えます。')
-        :'<p class="disp" style="font-size:1.6em">GAME OVER</p><p class="small">スコア '+score+'</p>'+tip('バーの端で打つと、角度がつけられます。青いアイテムを拾うとバーが広がりますよ。'))+
-        '</div><div class="foot">'+(win?'<button class="btn" data-go="minigame">DDスキャンでチケットを使う</button>':'<button class="btn" id="again">もう一度</button>')+'<button class="btn ghost" data-go="town">🏙 街へ戻る</button></div>','dark');
-      bind(e);const a=e.querySelector('#again');if(a)a.addEventListener('click',play);
-    }
   }
   intro();
 };
@@ -823,15 +708,7 @@ S.town=function(){
     go(t);
   }
   function questGo(){({0:()=>{},1:()=>openB(HQ),2:()=>go('deal'),4:gamesSheet,5:()=>go('shop')}[G.q]||(()=>{}))()}
-  function gamesSheet(){
-    const m=document.createElement('div');m.className='modal';
-    m.innerHTML='<div class="sheet dark-sheet"><p class="tn">🎮 ミニゲーム</p><div class="gcards">'+
-      '<button data-g="minigame"><span class="ga" style="background:linear-gradient(160deg,#2f5e6e,#1d3a46)">🔍</span><b>DDスキャン</b><i>🧠 推理</i><em>🪙〜300</em></button>'+
-      '<button data-g="breaker"><span class="ga" style="background:linear-gradient(160deg,#ef6b5b,#b48cff)">🧱</span><b>ブロックブレイク</b><i>⚡ アクション</i><em>🪙〜500</em></button></div>'+
-      '<button class="btn ghost" data-close>閉じる</button></div>';
-    $stage.firstChild.appendChild(m);
-    m.addEventListener('click',e=>{const g=e.target.closest('[data-g]');if(g){questDone(4);saveG();go(g.dataset.g)}else if(e.target===m||e.target.closest('[data-close]'))m.remove()});
-  }
+  function gamesSheet(){questDone(4);saveG();go('minigame')}
   draw(()=>{
     if(G.welcome){G.welcome=false;saveG();
       const m=document.createElement('div');m.className='modal center';
@@ -1123,8 +1000,7 @@ const GL={
  'TOB':['TOB（株式公開買付け）','Takeover Bid','上場会社の株を、期間・価格・数を公表して市場の外で多くの株主から買い集める方法。金融商品取引法でルールが決められています。','後半の章や追加ケースで登場予定です。'],
  '企業獣':['企業獣（カンパニー・ビースト）','Company Beast','このゲームの世界で、会社を生き物として表した存在。業種で姿が変わり、売上や利益がステータスになります。','いつでも本当の数字（財務）に切り替えて見られる設計です。'],
  '探索':['探索（ソーシング）','Sourcing','買収する相手の候補を探すこと。自社の戦略（何を手に入れたいか）に合う会社を見つけるところからM&Aは始まります。','戦略に合う企業獣を選ぶステップです。'],
- '参入障壁':['参入障壁','Barriers to Entry','新しい市場に入ろうとする会社をはばむ壁。規制・許認可、強い競合、大きな初期投資などがあります。M&Aは、すでに市場にいる会社を買うことで、この壁を越える方法のひとつです。','障壁ブレイクのブロックがこれです。'],
- 'FA':['FA（フィナンシャル・アドバイザー）','Financial Advisor','M&Aで買い手か売り手の一方につき、相手探し・価値の算定・交渉などを手伝う専門家。','拾うとバーが広がります。'],
+ 'FA':['FA（フィナンシャル・アドバイザー）','Financial Advisor','M&Aで買い手か売り手の一方につき、相手探し・価値の算定・交渉などを手伝う専門家。',''],
  '在庫の水増し':['在庫の水増し','Inflated Inventory','実際より在庫を多く見せかけること。利益や資産が実態より大きく見えるため、買い手は高く払いすぎるおそれがあります。',''],
  '売掛金の焦げつき':['売掛金の焦げつき','Bad Receivables','売ったのに代金を回収できない状態。帳簿上は資産でも、実際には価値がないことがあります。',''],
  '保証債務':['保証債務','Guarantee Obligations','他人の借金の保証人になっていることによる支払い義務。相手が返せないと、代わりに払う必要があります。簿外債務になりやすい代表例です。',''],
