@@ -1,35 +1,35 @@
 // M&A学習ゲーム チュートリアル体験をローカルで起動する簡易サーバー（外部依存なし）
-// 実体は ../mockup/index.html。ここで HTML の骨組み（doctype・viewport）を付けて配信する。
+// ../mockup/ フォルダをそのまま配信する。
 const http = require('http');
 const fs = require('fs');
 const path = require('path');
 
 const PORT = Number(process.env.PORT) || 5173;
-const MOCKUP = path.join(__dirname, '..', 'mockup', 'index.html');
-
-function page() {
-  const body = fs.readFileSync(MOCKUP, 'utf8');
-  return '<!doctype html>\n<html lang="ja">\n<head>\n<meta charset="utf-8">\n' +
-    '<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">\n' +
-    '<style>:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0}</style>\n' +
-    '</head>\n<body>\n' + body + '\n</body>\n</html>\n';
-}
+const ROOT = path.join(__dirname, '..', 'mockup');
+const TYPES = { '.html': 'text/html; charset=utf-8', '.css': 'text/css; charset=utf-8', '.js': 'text/javascript; charset=utf-8',
+  '.json': 'application/json; charset=utf-8', '.glb': 'model/gltf-binary', '.png': 'image/png', '.jpg': 'image/jpeg',
+  '.svg': 'image/svg+xml', '.md': 'text/plain; charset=utf-8', '.mp3': 'audio/mpeg', '.ogg': 'audio/ogg', '.wav': 'audio/wav' };
 
 http.createServer((req, res) => {
-  const url = (req.url || '/').split('?')[0];
-  if (url === '/' || url === '/index.html') {
-    try {
-      res.writeHead(200, { 'Content-Type': 'text/html; charset=utf-8', 'Cache-Control': 'no-store' });
-      res.end(page());
-    } catch (e) {
-      res.writeHead(500, { 'Content-Type': 'text/plain; charset=utf-8' });
-      res.end('mockup/index.html を読み込めませんでした: ' + e.message);
-    }
+  let url = '/';
+  try { url = decodeURIComponent((req.url || '/').split('?')[0]); } catch (e) {}
+  if (url.endsWith('/')) url += 'index.html';
+  const file = path.normalize(path.join(ROOT, url));
+  if (file !== ROOT && !file.startsWith(ROOT + path.sep)) {
+    res.writeHead(403, { 'Content-Type': 'text/plain; charset=utf-8' });
+    res.end('Forbidden');
     return;
   }
-  res.writeHead(404, { 'Content-Type': 'text/plain; charset=utf-8' });
-  res.end('Not found');
+  fs.readFile(file, (err, data) => {
+    if (err) {
+      res.writeHead(404, { 'Content-Type': 'text/plain; charset=utf-8' });
+      res.end('Not found');
+      return;
+    }
+    res.writeHead(200, { 'Content-Type': TYPES[path.extname(file).toLowerCase()] || 'application/octet-stream', 'Cache-Control': 'no-store' });
+    res.end(data);
+  });
 }).listen(PORT, () => {
   console.log('Deal Tamers チュートリアルを起動しました → http://localhost:' + PORT);
-  console.log('mockup/index.html を保存したら、ブラウザを再読み込みすると反映されます。終了は Ctrl+C');
+  console.log('mockup/ のファイルを保存したら、ブラウザを再読み込みすると反映されます。終了は Ctrl+C');
 });
